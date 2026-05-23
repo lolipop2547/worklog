@@ -319,7 +319,7 @@ function App() {
       const next = {...prev}; const cleaned = {};
       for (const cid in perCat) {
         const c = perCat[cid];
-        if (c && (c.note?.trim() || c.words || c.done)) cleaned[cid] = { note: c.note?.trim()||"", ...(c.words ? {words: c.words} : {}) };
+        if (c && (c.note?.trim() || c.words || c.done)) cleaned[cid] = { note: c.note?.trim()||"", ...(c.words ? {words: c.words} : {}), ...(c.done ? {done: true} : {}) };
       }
       if (Object.keys(cleaned).length===0) delete next[dateStr]; else next[dateStr] = cleaned;
       return next;
@@ -510,7 +510,7 @@ function DayEditor({ dateStr, categories, entry, onClose, onSave }) {
   const d = parseYmd(dateStr);
   const [draft, setDraft] = useState(() => {
     const init = {};
-    categories.forEach((c) => { const e = entry[c.id] || {}; init[c.id] = { note: e.note||"", words: e.words||"", done: e.done||false };
+    categories.forEach((c) => { const e = entry[c.id] || {}; init[c.id] = { note: e.note||"", words: e.words||"", done: e.done||false }; });
     return init;
   });
   const setField = (cid, field, val) => setDraft((prev) => ({...prev, [cid]: {...prev[cid], [field]: val}}));
