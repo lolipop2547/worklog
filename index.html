@@ -120,8 +120,22 @@
   .toggle-btn.on { background: var(--accent-soft); color: var(--accent); border-color: #f0c9a8; font-weight: 700; }
   .hint { font-size: 12px; color: var(--faint); margin: 8px 2px 14px; }
   .cat-list { display: flex; flex-direction: column; gap: 8px; }
-  .cat-item { display: flex; align-items: center; gap: 8px; background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 6px 8px; }
-  .cat-name-input { flex: 1; border: none; background: transparent; font-size: 14px; color: var(--ink); padding: 2px 0; }
+  .cat-item { display: flex; align-items: center; gap: 8px; background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 6px 8px; position: relative; transition: border-color .12s, transform .08s, box-shadow .12s; }
+  .cat-item.dragging { opacity: .5; }
+  .cat-item.drag-over { border-color: var(--accent); box-shadow: 0 -2px 0 var(--accent) inset; }
+  .drag-handle { cursor: grab; color: #cbb89d; font-size: 14px; line-height: 1; letter-spacing: -2px; user-select: none; flex-shrink: 0; }
+  .drag-handle:active { cursor: grabbing; }
+  .reorder-btns { display: flex; flex-direction: column; gap: 1px; flex-shrink: 0; }
+  .reorder-btn { background: #fff; border: 1px solid var(--line-strong); color: #9c8d77; width: 20px; height: 15px; font-size: 10px; line-height: 1; padding: 0; border-radius: 4px; }
+  .reorder-btn:disabled { opacity: .3; }
+  .swatch-btn { width: 20px; height: 20px; border-radius: 6px; border: 1px solid #00000018; flex-shrink: 0; cursor: pointer; padding: 0; }
+  .color-pop { position: absolute; top: 100%; left: 8px; margin-top: 4px; background: #fff; border: 1px solid var(--line-strong); border-radius: 12px; padding: 10px; box-shadow: 0 8px 24px #00000022; z-index: 10; }
+  .color-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 8px; }
+  .color-cell { width: 26px; height: 26px; border-radius: 7px; border: 2px solid transparent; cursor: pointer; padding: 0; }
+  .color-cell.sel { border-color: var(--ink-deep); box-shadow: 0 0 0 2px #fff inset; }
+  .color-custom { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--muted); }
+  .color-custom input[type=color] { width: 36px; height: 26px; border: none; background: none; padding: 0; cursor: pointer; }
+  .cat-name-input { flex: 1; min-width: 40px; border: none; background: transparent; font-size: 14px; color: var(--ink); padding: 2px 0; }
   .mini-tag { border: 1px solid var(--line-strong); background: #fff; border-radius: 16px; padding: 3px 10px; font-size: 11px; color: var(--muted); }
   .mini-tag.on { background: var(--accent-soft); color: var(--accent); border-color: #f0c9a8; font-weight: 700; }
   .del-btn { background: none; border: none; font-size: 22px; color: #cbb89d; line-height: 1; padding: 0 4px; }
@@ -323,6 +337,16 @@ function App() {
   };
   const updateCategory = (id, patch) => setCategories((prev) => prev.map((c) => c.id===id ? {...c,...patch} : c));
   const removeCategory = (id) => setCategories((prev) => prev.filter((c) => c.id!==id));
+  const reorderCategory = (fromId, toId) => setCategories((prev) => {
+    if (fromId === toId) return prev;
+    const arr = [...prev];
+    const from = arr.findIndex((c) => c.id === fromId);
+    const to = arr.findIndex((c) => c.id === toId);
+    if (from < 0 || to < 0) return prev;
+    const [moved] = arr.splice(from, 1);
+    arr.splice(to, 0, moved);
+    return arr;
+  });
 
   const saveDayEntry = (dateStr, perCat) => {
     setEntries((prev) => {
@@ -510,7 +534,7 @@ function App() {
           onSave={(perCat) => { saveDayEntry(selectedDate, perCat); setSelectedDate(null); }} />
       )}
       {manageOpen && (
-        <CategoryManager categories={categories} onAdd={addCategory} onUpdate={updateCategory} onRemove={removeCategory} onClose={() => setManageOpen(false)} />
+        <CategoryManager categories={categories} onAdd={addCategory} onUpdate={updateCategory} onRemove={removeCategory} onReorder={reorderCategory} onClose={() => setManageOpen(false)} />
       )}
       {syncOpen && (
         <SyncManager token={token} gistId={gistId} onConnect={connectGist} onDisconnect={disconnectGist} onClose={() => setSyncOpen(false)} />
@@ -584,9 +608,20 @@ function DayEditor({ dateStr, categories, entry, onClose, onSave }) {
 }
 
 // ===================== 항목 관리 =====================
-function CategoryManager({ categories, onAdd, onUpdate, onRemove, onClose }) {
+function CategoryManager({ categories, onAdd, onUpdate, onRemove, onReorder, onClose }) {
   const [name, setName] = useState(""); const [isWork, setIsWork] = useState(true);
+  const [dragId, setDragId] = useState(null);
+  const [overId, setOverId] = useState(null);
+  const [pickerId, setPickerId] = useState(null);
   const handleAdd = () => { if (!name.trim()) return; onAdd(name.trim(), isWork); setName(""); };
+
+  const move = (id, dir) => {
+    const i = categories.findIndex((c) => c.id === id);
+    const j = i + dir;
+    if (j < 0 || j >= categories.length) return;
+    onReorder(id, categories[j].id);
+  };
+
   return (
     <div className="overlay" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
@@ -598,14 +633,41 @@ function CategoryManager({ categories, onAdd, onUpdate, onRemove, onClose }) {
             <button className={`toggle-btn${isWork ? " on" : ""}`} onClick={() => setIsWork((v) => !v)}>{isWork ? "작품 ✓" : "일반"}</button>
             <button className="primary-btn" onClick={handleAdd}>추가</button>
           </div>
-          <p className="hint">'작품'으로 지정하면 글자 수를 함께 기록할 수 있어요.</p>
+          <p className="hint">색칠된 사각형을 누르면 색을 바꿀 수 있어요. 손잡이(⋮⋮)를 끌거나 ↑↓ 버튼으로 순서를 바꿉니다.</p>
           <div className="cat-list">
-            {categories.map((c) => (
-              <div key={c.id} className="cat-item">
-                <span className="entry-swatch" style={{ background: c.color }} />
+            {categories.map((c, idx) => (
+              <div key={c.id}
+                className={`cat-item${overId===c.id && dragId && dragId!==c.id ? " drag-over" : ""}${dragId===c.id ? " dragging" : ""}`}
+                draggable
+                onDragStart={() => setDragId(c.id)}
+                onDragEnter={() => setOverId(c.id)}
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={() => { if (dragId) onReorder(dragId, c.id); setDragId(null); setOverId(null); }}
+                onDragEnd={() => { setDragId(null); setOverId(null); }}
+              >
+                <span className="drag-handle" title="끌어서 순서 변경">⋮⋮</span>
+                <div className="reorder-btns">
+                  <button className="reorder-btn" onClick={() => move(c.id, -1)} disabled={idx===0} aria-label="위로">↑</button>
+                  <button className="reorder-btn" onClick={() => move(c.id, 1)} disabled={idx===categories.length-1} aria-label="아래로">↓</button>
+                </div>
+                <button className="swatch-btn" style={{ background: c.color }} onClick={() => setPickerId(pickerId===c.id ? null : c.id)} aria-label="색 바꾸기" />
                 <input className="cat-name-input" value={c.name} onChange={(e) => onUpdate(c.id, { name: e.target.value })} />
                 <button className={`mini-tag${c.isWork ? " on" : ""}`} onClick={() => onUpdate(c.id, { isWork: !c.isWork })}>{c.isWork ? "작품" : "일반"}</button>
                 <button className="del-btn" onClick={() => onRemove(c.id)} aria-label="삭제">×</button>
+                {pickerId===c.id && (
+                  <div className="color-pop" onClick={(e) => e.stopPropagation()}>
+                    <div className="color-grid">
+                      {PALETTE.map((p) => (
+                        <button key={p} className={`color-cell${c.color===p ? " sel" : ""}`} style={{ background: p }}
+                          onClick={() => { onUpdate(c.id, { color: p }); setPickerId(null); }} aria-label={p} />
+                      ))}
+                    </div>
+                    <label className="color-custom">
+                      직접 고르기
+                      <input type="color" value={c.color} onChange={(e) => onUpdate(c.id, { color: e.target.value })} />
+                    </label>
+                  </div>
+                )}
               </div>
             ))}
           </div>
