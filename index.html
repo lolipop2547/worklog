@@ -73,6 +73,9 @@
   .day.today { border: 2px solid var(--accent); background: #fff7ef; }
   .day-num { font-size: 14px; }
   .day-dots { display: flex; gap: 2px; margin-top: auto; margin-bottom: 4px; flex-wrap: wrap; justify-content: center; max-width: 90%; }
+  .day-words { margin-top: auto; margin-bottom: 4px; height: 16px; display: flex; align-items: center; justify-content: center; }
+  .words-count { font-size: 11px; font-weight: 700; color: var(--accent); line-height: 1; }
+  .words-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--faint); }
   .dot { width: 6px; height: 6px; border-radius: 50%; }
 
   .gant-title { font-family: var(--font-display); font-size: 17px; font-weight: 700; margin-bottom: 12px; color: var(--ink-deep); }
@@ -306,6 +309,13 @@ function App() {
     return categories.filter((c) => day[c.id] && (day[c.id].note?.trim() || day[c.id].words || day[c.id].done)).map((c) => c.color);
   }, [entries, categories]);
 
+  const dayWordCount = useCallback((dateStr) => {
+    const day = entries[dateStr]; if (!day) return 0;
+    let sum = 0;
+    for (const cid in day) { if (day[cid]?.words) sum += day[cid].words; }
+    return sum;
+  }, [entries]);
+
   const addCategory = (name, isWork) => {
     const used = new Set(categories.map((c) => c.color));
     const color = PALETTE.find((p) => !used.has(p)) || PALETTE[categories.length % PALETTE.length];
@@ -423,11 +433,15 @@ function App() {
           <div key={wi} className="week-row">
             {week.map((date, di) => {
               if (!date) return <div key={di} className="day-empty" />;
-              const ds = ymd(date); const colors = dayHasAny(ds); const isToday = ds===todayStr();
+              const ds = ymd(date); const colors = dayHasAny(ds); const words = dayWordCount(ds); const isToday = ds===todayStr();
               return (
                 <button key={di} className={`day${isToday ? " today" : ""}`} onClick={() => setSelectedDate(ds)}>
                   <span className="day-num" style={{ color: di===0 ? "#b91c1c" : di===6 ? "#1d4ed8" : "#3a3027", fontWeight: isToday ? 800 : 500 }}>{date.getDate()}</span>
-                  <div className="day-dots">{colors.slice(0,5).map((c, i) => <span key={i} className="dot" style={{ background: c }} />)}</div>
+                  <div className="day-words">
+                    {words > 0
+                      ? <span className="words-count">{words >= 1000 ? (words/1000).toFixed(words % 1000 === 0 ? 0 : 1) + "k" : words}</span>
+                      : (colors.length > 0 ? <span className="words-dot" /> : null)}
+                  </div>
                 </button>
               );
             })}
