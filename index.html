@@ -290,7 +290,7 @@ function App() {
       const d = parseYmd(ds);
       if (d.getFullYear()===year && d.getMonth()===month) {
         const day = entries[ds];
-        for (const cid in day) { const c = day[cid]; if (c && (c.note?.trim() || c.words)) present.add(cid); }
+        for (const cid in day) { const c = day[cid]; if (c && (c.note?.trim() || c.words || c.done)) present.add(cid); }
       }
     }
     return categories.filter((c) => present.has(c.id));
@@ -298,12 +298,12 @@ function App() {
 
   const hasEntryOn = useCallback((cid, dateStr) => {
     const day = entries[dateStr]; if (!day || !day[cid]) return false;
-    const c = day[cid]; return !!(c.note?.trim() || c.words);
+    const c = day[cid]; return !!(c.note?.trim() || c.words || c.done);
   }, [entries]);
 
   const dayHasAny = useCallback((dateStr) => {
     const day = entries[dateStr]; if (!day) return [];
-    return categories.filter((c) => day[c.id] && (day[c.id].note?.trim() || day[c.id].words)).map((c) => c.color);
+    return categories.filter((c) => day[c.id] && (day[c.id].note?.trim() || day[c.id].words || day[c.id].done)).map((c) => c.color);
   }, [entries, categories]);
 
   const addCategory = (name, isWork) => {
@@ -319,7 +319,7 @@ function App() {
       const next = {...prev}; const cleaned = {};
       for (const cid in perCat) {
         const c = perCat[cid];
-        if (c && (c.note?.trim() || c.words)) cleaned[cid] = { note: c.note?.trim()||"", ...(c.words ? {words: c.words} : {}) };
+        if (c && (c.note?.trim() || c.words || c.done)) cleaned[cid] = { note: c.note?.trim()||"", ...(c.words ? {words: c.words} : {}) };
       }
       if (Object.keys(cleaned).length===0) delete next[dateStr]; else next[dateStr] = cleaned;
       return next;
@@ -351,7 +351,7 @@ function App() {
       const d = parseYmd(ds);
       if (d.getFullYear()===year && d.getMonth()===month) {
         const day = entries[ds]; let counted = false;
-        for (const cid in day) { const c = day[cid]; if (c && (c.note?.trim() || c.words)) counted = true; if (c?.words) totalWords += c.words; }
+        for (const cid in day) { const c = day[cid]; if (c && (c.note?.trim() || c.words || c.done)) counted = true; if (c?.words) totalWords += c.words; }
         if (counted) activeDays.add(ds);
       }
     }
@@ -510,7 +510,7 @@ function DayEditor({ dateStr, categories, entry, onClose, onSave }) {
   const d = parseYmd(dateStr);
   const [draft, setDraft] = useState(() => {
     const init = {};
-    categories.forEach((c) => { const e = entry[c.id] || {}; init[c.id] = { note: e.note||"", words: e.words||"" }; });
+    categories.forEach((c) => { const e = entry[c.id] || {}; init[c.id] = { note: e.note||"", words: e.words||"", done: e.done||false };
     return init;
   });
   const setField = (cid, field, val) => setDraft((prev) => ({...prev, [cid]: {...prev[cid], [field]: val}}));
@@ -518,7 +518,7 @@ function DayEditor({ dateStr, categories, entry, onClose, onSave }) {
     const out = {};
     categories.forEach((c) => {
       const e = draft[c.id]; const words = e.words==="" ? 0 : parseInt(e.words,10)||0;
-      out[c.id] = { note: e.note, ...(c.isWork && words ? {words} : {}) };
+      out[c.id] = { note: e.note, ...(c.isWork && words ? {words} : {}), ...(!c.isWork && e.done ? {done: true} : {}) };
     });
     onSave(out);
   };
@@ -548,6 +548,14 @@ function DayEditor({ dateStr, categories, entry, onClose, onSave }) {
                     value={draft[c.id].words} onChange={(e) => setField(c.id, "words", e.target.value)} />
                   <span className="words-label">자 작성</span>
                 </div>
+              )}
+              {!c.isWork && (
+                <label className="words-row" style={{ cursor: "pointer", userSelect: "none" }}>
+                  <input type="checkbox" checked={draft[c.id].done}
+                    onChange={(e) => setField(c.id, "done", e.target.checked)}
+                    style={{ width: 18, height: 18, accentColor: "var(--accent)" }} />
+                  <span className="words-label">완료로 표시</span>
+                </label>
               )}
             </div>
           ))}
