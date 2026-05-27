@@ -33,6 +33,61 @@
     min-height: 100vh;
   }
   .wrap { max-width: 880px; margin: 0 auto; padding: 24px 16px 80px; }
+
+  /* 탭 바 */
+  .tab-bar { display: flex; gap: 6px; background: #f1e8d8; border: 1px solid var(--line); border-radius: 12px; padding: 4px; margin-bottom: 18px; }
+  .tab-btn { flex: 1; border: none; background: transparent; padding: 9px 8px; border-radius: 9px; font-family: var(--font-body); font-size: 14px; font-weight: 700; color: var(--muted); }
+  .tab-btn.on { background: var(--card); color: var(--accent); box-shadow: 0 1px 3px #0000000f; }
+
+  /* 거짓 경보 */
+  .alarm-headline { background: linear-gradient(160deg, #fff, #fdfaf4); border: 1px solid var(--line); border-radius: 18px; padding: 20px; margin-bottom: 16px; text-align: center; }
+  .alarm-headline .lead { color: var(--muted); font-size: 13px; margin-bottom: 10px; }
+  .alarm-nums { display: flex; align-items: center; justify-content: center; gap: 14px; }
+  .alarm-nums .n { display: flex; flex-direction: column; align-items: center; }
+  .alarm-nums .v { font-family: var(--font-display); font-weight: 700; font-size: 36px; line-height: 1; }
+  .alarm-nums .k { font-size: 11px; color: var(--muted); margin-top: 6px; }
+  .alarm-nums .fear .v { color: #d9534a; }
+  .alarm-nums .real .v { color: #15803d; }
+  .alarm-nums .arrow { color: var(--faint); font-size: 20px; }
+  .alarm-verdict { margin-top: 13px; font-family: var(--font-display); font-size: 15px; color: var(--accent); min-height: 20px; }
+  .alarm-card { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px #0000000d; }
+  .step-label { font-size: 12px; color: var(--accent); letter-spacing: .5px; margin-bottom: 6px; font-weight: 700; }
+  .alarm-q { font-family: var(--font-display); font-size: 18px; margin-bottom: 4px; line-height: 1.5; color: var(--ink-deep); }
+  .alarm-hint { color: var(--muted); font-size: 12.5px; line-height: 1.6; margin-bottom: 16px; }
+  .scale { display: flex; gap: 6px; flex-wrap: wrap; }
+  .scale button { flex: 1; min-width: 26px; aspect-ratio: 1; border-radius: 10px; border: 1px solid var(--line-strong); background: #fdfbf6; color: var(--muted); font-family: var(--font-display); font-size: 16px; transition: .12s; }
+  .scale button:active { transform: scale(.9); }
+  .scale.fear button.sel { background: #d9534a; color: #fff; border-color: #d9534a; }
+  .scale.real button.sel { background: #15803d; color: #fff; border-color: #15803d; }
+  .scale-ends { display: flex; justify-content: space-between; font-size: 11px; color: var(--faint); margin-top: 7px; }
+  .orb { width: 120px; height: 120px; border-radius: 50%; margin: 6px auto 14px; background: radial-gradient(circle at 40% 35%, #7fe3bb, #15803d); animation: bre 8s ease-in-out infinite; }
+  @keyframes bre { 0%,100% { transform: scale(.7); opacity: .65; } 50% { transform: scale(1); opacity: 1; } }
+  .alarm-cue { font-family: var(--font-display); font-size: 17px; min-height: 24px; color: var(--ink); text-align: center; }
+  .alarm-micro { color: var(--muted); font-size: 12.5px; margin-top: 10px; line-height: 1.7; text-align: center; }
+  .alarm-elapsed { font-family: var(--font-display); font-size: 40px; text-align: center; color: var(--ink-deep); margin-bottom: 8px; }
+  .alarm-btn { width: 100%; padding: 14px; border-radius: 12px; border: none; font-family: var(--font-body); font-size: 15px; font-weight: 700; margin-top: 14px; }
+  .alarm-btn:active { transform: scale(.98); }
+  .alarm-btn.go { background: linear-gradient(120deg, #15803d, #2fa97c); color: #fff; }
+  .alarm-btn.next { background: var(--accent); color: #fff; }
+  .alarm-btn.ghost { background: transparent; border: 1px solid var(--line-strong); color: var(--muted); }
+  .alarm-btn:disabled { opacity: .35; }
+  .alarm-note { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--line-strong); background: #fdfbf6; color: var(--ink); font-family: var(--font-body); font-size: 14px; resize: none; margin-top: 10px; }
+  .alarm-note:focus { outline: none; border-color: var(--accent); }
+  .alarm-hist h4 { font-size: 12px; color: var(--muted); font-weight: 400; letter-spacing: .5px; margin-bottom: 6px; }
+  .alarm-hist .desc { font-size: 11.5px; color: var(--faint); margin-bottom: 12px; line-height: 1.5; }
+  .alarm-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .alarm-row .when { font-size: 11px; color: var(--muted); width: 78px; flex-shrink: 0; }
+  .alarm-row .bars { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+  .alarm-row .bar { height: 7px; border-radius: 4px; }
+  .alarm-row .bar.f { background: #d9534a; }
+  .alarm-row .bar.r { background: #15803d; }
+  .alarm-row .delta { font-family: var(--font-display); font-size: 15px; color: var(--accent); width: 36px; text-align: right; }
+  .alarm-link { border-top: 1px dashed var(--line-strong); margin-top: 16px; padding-top: 14px; }
+  .alarm-link-label { font-size: 12px; color: var(--accent); font-weight: 700; margin-bottom: 8px; }
+  .cat-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .cat-chip { border: 1px solid var(--line-strong); background: #fdfbf6; color: #5a4d3c; border-radius: 18px; padding: 6px 13px; font-family: var(--font-body); font-size: 13px; }
+  .cat-chip.sel { font-weight: 700; }
+  .alarm-linked-note { font-size: 12.5px; color: #15803d; background: #eef7f0; border-radius: 10px; padding: 10px 12px; margin-top: 12px; line-height: 1.5; }
   h1 { font-family: var(--font-display); font-size: 30px; font-weight: 700; margin: 0; letter-spacing: -.02em; color: var(--ink-deep); }
   .subtitle { margin: 4px 0 0; font-size: 13px; color: var(--muted); }
 
@@ -80,6 +135,9 @@
 
   .gant-title { font-family: var(--font-display); font-size: 17px; font-weight: 700; margin-bottom: 12px; color: var(--ink-deep); }
   .empty { padding: 22px 8px; text-align: center; color: var(--faint); font-size: 13px; }
+  .reset { display: block; margin: 24px auto 0; background: none; border: none; color: var(--faint); font-size: 11px; cursor: pointer; }
+  .fade { animation: fd .35s; }
+  @keyframes fd { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
   .gant-scroll { overflow-x: auto; padding-bottom: 6px; }
   .gant-axis, .gant-row { display: flex; align-items: center; margin-bottom: 6px; }
   .gant-row-label { width: 92px; flex-shrink: 0; display: flex; align-items: center; gap: 6px; padding-right: 8px; }
@@ -226,8 +284,10 @@ async function gistWrite(token, gistId, payload) {
 
 // ===================== 메인 앱 =====================
 function App() {
+  const [tab, setTab] = useState("log"); // log | alarm
   const [categories, setCategories] = useState(DEFAULT_CATEGORIES);
   const [entries, setEntries] = useState({});
+  const [alarms, setAlarms] = useState([]); // 거짓 경보 기록 [{t, fear, real, dur, note}]
   const [cursor, setCursor] = useState(() => { const n = new Date(); return { year: n.getFullYear(), month: n.getMonth() }; });
   const [selectedDate, setSelectedDate] = useState(null);
   const [manageOpen, setManageOpen] = useState(false);
@@ -248,6 +308,7 @@ function App() {
         const data = JSON.parse(raw);
         if (data.categories?.length) setCategories(data.categories);
         if (data.entries) setEntries(data.entries);
+        if (data.alarms) setAlarms(data.alarms);
       }
     } catch (e) {}
     loadedRef.current = true;
@@ -258,6 +319,7 @@ function App() {
         .then((data) => {
           if (data.categories?.length) setCategories(data.categories);
           if (data.entries) setEntries(data.entries);
+          if (data.alarms) setAlarms(data.alarms);
           setSyncState("ok"); setSyncMsg("동기화됨 ✓");
           setTimeout(() => setSyncState("idle"), 1600);
         })
@@ -268,7 +330,7 @@ function App() {
   // 저장: 로컬 항상 + (연결됐으면) Gist 디바운스
   useEffect(() => {
     if (!loadedRef.current) return;
-    const payload = { categories, entries, updatedAt: Date.now() };
+    const payload = { categories, entries, alarms, updatedAt: Date.now() };
     try { localStorage.setItem(LS_DATA, JSON.stringify(payload)); } catch (e) {}
 
     if (token) {
@@ -283,7 +345,7 @@ function App() {
         } catch (err) { setSyncState("warn"); setSyncMsg("저장 실패"); console.warn(err); }
       }, 1200);
     }
-  }, [categories, entries, token, gistId]);
+  }, [categories, entries, alarms, token, gistId]);
 
   // 월 그리드
   const monthInfo = useMemo(() => {
@@ -360,6 +422,24 @@ function App() {
     });
   };
 
+  // 거짓 경보에서 그날 작품 기록에 글자 수를 더함 (기존 기록 보존, 글자 수는 합산)
+  const addWorkRecord = (dateStr, catId, words, note) => {
+    if (!catId) return;
+    setEntries((prev) => {
+      const next = {...prev};
+      const day = {...(next[dateStr] || {})};
+      const existing = day[catId] || { note: "", words: 0 };
+      const mergedNote = [existing.note, note].filter((s) => s && s.trim()).join(" / ");
+      day[catId] = {
+        note: mergedNote,
+        words: (existing.words || 0) + (words || 0),
+        ...(existing.done ? { done: true } : {}),
+      };
+      next[dateStr] = day;
+      return next;
+    });
+  };
+
   const exportData = () => {
     const blob = new Blob([JSON.stringify({ categories, entries }, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
@@ -403,6 +483,7 @@ function App() {
       .then((data) => {
         if (data.categories?.length) setCategories(data.categories);
         if (data.entries) setEntries(data.entries);
+        if (data.alarms) setAlarms(data.alarms);
         setSyncState("ok"); setSyncMsg("동기화됨 ✓"); setTimeout(() => setSyncState("idle"), 1600);
       })
       .catch(() => {
@@ -422,16 +503,22 @@ function App() {
     <div className="wrap">
       <header>
         <div>
-          <h1>작업 일지</h1>
-          <p className="subtitle">매일의 작업을 기록하고, 이어지는 흐름을 봅니다</p>
+          <h1>{tab==="log" ? "작업 일지" : "거짓 경보"}</h1>
+          <p className="subtitle">{tab==="log" ? "매일의 작업을 기록하고, 이어지는 흐름을 봅니다" : "시작 전 공포와 실제 사이의 거리를 기록해요"}</p>
         </div>
         <div className="header-right">
           <span className={`sync-badge ${syncClass}`}>{syncMsg}</span>
           <button className="ghost-btn" onClick={() => setSyncOpen(true)}>{token ? "동기화 ✓" : "동기화 설정"}</button>
-          <button className="ghost-btn" onClick={() => setManageOpen(true)}>항목 관리</button>
+          {tab==="log" && <button className="ghost-btn" onClick={() => setManageOpen(true)}>항목 관리</button>}
         </div>
       </header>
 
+      <div className="tab-bar">
+        <button className={`tab-btn${tab==="log" ? " on" : ""}`} onClick={() => setTab("log")}>작업 일지</button>
+        <button className={`tab-btn${tab==="alarm" ? " on" : ""}`} onClick={() => setTab("alarm")}>거짓 경보</button>
+      </div>
+
+      {tab==="log" && (<React.Fragment>
       <div className="month-bar">
         <button className="nav-btn" onClick={prevMonth} aria-label="이전 달">‹</button>
         <div className="month-label">
@@ -527,6 +614,12 @@ function App() {
           <input type="file" accept="application/json" style={{ display: "none" }} onChange={(e) => e.target.files[0] && importData(e.target.files[0])} />
         </label>
       </div>
+      </React.Fragment>)}
+
+      {tab==="alarm" && (
+        <AlarmTab alarms={alarms} workCats={categories.filter((c) => c.isWork)} onAddWork={addWorkRecord}
+          onAdd={(rec) => setAlarms((prev) => [...prev, rec])} onClear={() => setAlarms([])} />
+      )}
 
       {selectedDate && (
         <DayEditor dateStr={selectedDate} categories={categories} entry={entries[selectedDate] || {}}
@@ -706,6 +799,208 @@ function SyncManager({ token, gistId, onConnect, onDisconnect, onClose }) {
           <button className="primary-btn" onClick={handleConnect}>연결</button>
         </div>
       </div>
+    </div>
+  );
+}
+
+
+// ===================== 거짓 경보 탭 =====================
+function AlarmTab({ alarms, workCats, onAddWork, onAdd, onClear }) {
+  const [step, setStep] = useState(1);
+  const [fear, setFear] = useState(null);
+  const [real, setReal] = useState(null);
+  const [note, setNote] = useState("");
+  const [catId, setCatId] = useState("");
+  const [words, setWords] = useState("");
+  const [elapsed, setElapsed] = useState(0);
+  const [cue, setCue] = useState("숨을 천천히 내쉬어요");
+  const [canStart, setCanStart] = useState(false);
+  const workStart = useRef(null);
+  const tickRef = useRef(null);
+  const breathRef = useRef(null);
+
+  const avg = useMemo(() => {
+    if (alarms.length === 0) return null;
+    const af = alarms.reduce((s, x) => s + x.fear, 0) / alarms.length;
+    const ar = alarms.reduce((s, x) => s + x.real, 0) / alarms.length;
+    return { af, ar, gap: af - ar };
+  }, [alarms]);
+
+  const verdict = useMemo(() => {
+    if (!avg) return "아직 기록이 없어요. 다음 막막함이 올 때 첫 기록을 남겨보세요.";
+    if (alarms.length < 3) return alarms.length + "번 기록됨. 몇 번 더 쌓이면 패턴이 보여요.";
+    if (avg.gap >= 2) return "매번 " + avg.gap.toFixed(1) + "점씩 과대평가했어요. 그 경보, 거의 항상 거짓이에요.";
+    if (avg.gap > 0) return "실제가 공포보다 " + avg.gap.toFixed(1) + "점 낮아요. 조금씩 보이죠?";
+    return "이번엔 공포와 실제가 비슷했네요. 그것도 데이터예요.";
+  }, [avg, alarms.length]);
+
+  useEffect(() => {
+    if (step !== 2) return;
+    const cues = ["숨을 천천히 들이쉬고…", "길게 내쉬어요 (4초)", "다시, 천천히 들이쉬고…", "더 길게 내쉬어요"];
+    let phase = 0, count = 0;
+    setCue(cues[0]); setCanStart(false);
+    breathRef.current = setInterval(() => {
+      phase = (phase + 1) % cues.length; count += 4;
+      setCue(cues[phase]);
+      if (count >= 16) setCanStart(true);
+    }, 4000);
+    const t = setTimeout(() => setCanStart(true), 9000);
+    return () => { clearInterval(breathRef.current); clearTimeout(t); };
+  }, [step]);
+
+  useEffect(() => {
+    if (step !== 3) return;
+    workStart.current = Date.now(); setElapsed(0);
+    tickRef.current = setInterval(() => setElapsed(Math.floor((Date.now() - workStart.current) / 1000)), 1000);
+    return () => clearInterval(tickRef.current);
+  }, [step]);
+
+  const fmt = (s) => Math.floor(s/60) + ":" + String(s%60).padStart(2,"0");
+  const whenStr = (t) => { const d = new Date(t); return (d.getMonth()+1) + "/" + d.getDate() + " " + String(d.getHours()).padStart(2,"0") + ":" + String(d.getMinutes()).padStart(2,"0"); };
+
+  const reset = () => { setStep(1); setFear(null); setReal(null); setNote(""); setCatId(""); setWords(""); setElapsed(0); setCanStart(false); };
+
+  const saveEntry = () => {
+    const dur = workStart.current ? Math.floor((Date.now() - workStart.current) / 1000) : 0;
+    const w = words === "" ? 0 : parseInt(words, 10) || 0;
+    onAdd({ t: Date.now(), fear, real, dur, note: note.trim(), catId: catId || null, words: w });
+    if (catId && (w || note.trim())) {
+      onAddWork(todayStr(), catId, w, note.trim());
+    }
+    setStep(5);
+  };
+
+  const reveal = () => {
+    const gap = fear - real;
+    if (gap >= 3) return { line: "공포 " + fear + " → 실제 " + real, sub: gap + "점이나 과대평가했어요. 시작 전 그 막막함은 거의 거짓말이었어요. 이걸 몸이 기억하게 하는 게 목적이에요." };
+    if (gap > 0) return { line: "공포 " + fear + " → 실제 " + real, sub: "실제가 " + gap + "점 낮았어요. 한 번 더 쌓였습니다." };
+    if (gap === 0) return { line: "공포 " + fear + " = 실제 " + real, sub: "이번엔 예측이 정확했네요. 솔직하게 기록한 게 중요해요." };
+    return { line: "공포 " + fear + " → 실제 " + real, sub: "이번엔 실제가 더 힘들었어요. 그런 날도 있어요. 그래도 시작은 했잖아요." };
+  };
+
+  const Scale = ({ cls, value, onPick }) => (
+    <div className={"scale " + cls}>
+      {Array.from({length: 11}, (_, i) => i).map((i) => (
+        <button key={i} className={value===i ? "sel" : ""} onClick={() => onPick(i)}>{i}</button>
+      ))}
+    </div>
+  );
+
+  return (
+    <div>
+      <div className="alarm-headline">
+        <div className="lead">당신의 평균</div>
+        <div className="alarm-nums">
+          <div className="n fear"><div className="v">{avg ? avg.af.toFixed(1) : "–"}</div><div className="k">시작 전 공포</div></div>
+          <div className="arrow">→</div>
+          <div className="n real"><div className="v">{avg ? avg.ar.toFixed(1) : "–"}</div><div className="k">실제 힘듦</div></div>
+        </div>
+        <div className="alarm-verdict">{verdict}</div>
+      </div>
+
+      {step===1 && (
+        <div className="alarm-card fade">
+          <div className="step-label">STEP 1 · 시작 직전</div>
+          <div className="alarm-q">지금 이거 하기가 얼마나 막막해?</div>
+          <div className="alarm-hint">머리로 따지지 말고 몸이 느끼는 걸로. 숨 막히는 정도.</div>
+          <Scale cls="fear" value={fear} onPick={setFear} />
+          <div className="scale-ends"><span>0 · 아무렇지 않음</span><span>10 · 숨 막힘</span></div>
+          <button className="alarm-btn go" disabled={fear===null} onClick={() => setStep(2)}>기록하고 시작 준비</button>
+        </div>
+      )}
+
+      {step===2 && (
+        <div className="alarm-card fade">
+          <div className="step-label">STEP 2 · 60초 다리 건너기</div>
+          <div className="orb" />
+          <div className="alarm-cue">{cue}</div>
+          <div className="alarm-micro">이건 베껴 쓰기예요. 잘 쓸 필요 없어요.<br/>경보는 일이 위험해서가 아니라 "글쓰기"라는 말에 켜진 거예요.</div>
+          {canStart
+            ? <button className="alarm-btn go fade" onClick={() => setStep(3)}>지금 시작 — 타이머 켜기</button>
+            : <button className="alarm-btn ghost" onClick={() => setStep(3)}>호흡 건너뛰고 바로 시작</button>}
+        </div>
+      )}
+
+      {step===3 && (
+        <div className="alarm-card fade">
+          <div className="step-label">STEP 3 · 진행 중</div>
+          <div className="alarm-elapsed">{fmt(elapsed)}</div>
+          <div className="alarm-hint">끝까지 안 해도 돼요. 멈추고 싶을 때 아래 눌러요.<br/>중요한 건 "시작했다"는 사실이에요.</div>
+          <button className="alarm-btn next" onClick={() => { setReal(null); setNote(""); setStep(4); }}>멈춤 · 실제 어땠는지 기록</button>
+        </div>
+      )}
+
+      {step===4 && (
+        <div className="alarm-card fade">
+          <div className="step-label">STEP 4 · 끝나고</div>
+          <div className="alarm-q">막상 해보니 실제로 얼마나 힘들었어?</div>
+          <div className="alarm-hint">시작 전 공포랑 비교해서. 솔직하게.</div>
+          <Scale cls="real" value={real} onPick={setReal} />
+          <div className="scale-ends"><span>0 · 할 만했음</span><span>10 · 진짜 힘듦</span></div>
+          {real!==null && (<React.Fragment>
+            <div className="alarm-link">
+              <div className="alarm-link-label">오늘 작품 기록에 연결 (선택)</div>
+              <div className="cat-chips">
+                {workCats.length===0
+                  ? <div className="alarm-hint" style={{margin:0}}>작품 항목이 없어요. 작업 일지 탭의 항목 관리에서 추가할 수 있어요.</div>
+                  : workCats.map((c) => (
+                      <button key={c.id} className={"cat-chip" + (catId===c.id ? " sel" : "")}
+                        style={catId===c.id ? { background: c.color, borderColor: c.color, color: "#fff" } : {}}
+                        onClick={() => setCatId(catId===c.id ? "" : c.id)}>
+                        {c.name}
+                      </button>
+                    ))}
+              </div>
+              {catId && (
+                <div className="words-row" style={{marginTop:10}}>
+                  <input className="words-input" type="number" min="0" placeholder="0"
+                    value={words} onChange={(e) => setWords(e.target.value)} />
+                  <span className="words-label">자 작성 — 오늘 이 작품 기록에 더해져요</span>
+                </div>
+              )}
+            </div>
+            <textarea className="alarm-note" rows={2} value={note} onChange={(e) => setNote(e.target.value)}
+              placeholder="한 줄 메모 (선택) — 오늘 시작 직전 가장 도움 된 것 / 몸 느낌" />
+          </React.Fragment>)}
+          <button className="alarm-btn next" disabled={real===null} onClick={saveEntry}>기록 저장</button>
+        </div>
+      )}
+
+      {step===5 && (() => { const r = reveal(); const linkedCat = catId ? workCats.find((c) => c.id===catId) : null; const w = words === "" ? 0 : parseInt(words,10)||0; return (
+        <div className="alarm-card fade">
+          <div className="step-label">기록됨 ✓</div>
+          <div className="alarm-q">{r.line}</div>
+          <div className="alarm-hint">{r.sub}</div>
+          {linkedCat && (w || note.trim()) && (
+            <div className="alarm-linked-note">오늘 <b style={{color: linkedCat.color}}>{linkedCat.name}</b> 기록에 {w ? w.toLocaleString()+"자" : "작업"}가 더해졌어요. 작업 일지 탭에서 확인할 수 있어요.</div>
+          )}
+          <button className="alarm-btn ghost" onClick={reset}>닫기</button>
+        </div>
+      ); })()}
+
+      <div className="alarm-hist">
+        <h4>지나간 거짓 경보들</h4>
+        <div className="desc">빨강 = 시작 전 공포 · 초록 = 실제 · 오른쪽 숫자 = 줄어든 폭</div>
+        {alarms.length===0 ? (
+          <div className="empty">첫 기록을 기다리는 중</div>
+        ) : (
+          alarms.slice().reverse().slice(0, 12).map((x, i) => {
+            const delta = x.fear - x.real;
+            return (
+              <div key={i} className="alarm-row">
+                <div className="when">{whenStr(x.t)}</div>
+                <div className="bars">
+                  <div className="bar f" style={{ width: (x.fear*9+10) + "%" }} />
+                  <div className="bar r" style={{ width: (x.real*9+10) + "%" }} />
+                </div>
+                <div className="delta">{delta>0 ? "-"+delta : delta===0 ? "0" : "+"+(-delta)}</div>
+              </div>
+            );
+          })
+        )}
+      </div>
+
+      {alarms.length > 0 && <button className="reset" onClick={() => { if (confirm("거짓 경보 기록을 모두 지울까요?")) onClear(); }}>거짓 경보 기록 초기화</button>}
     </div>
   );
 }
