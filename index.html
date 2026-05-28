@@ -432,6 +432,34 @@ function App() {
     return () => clearInterval(interval);
   }, []);
 
+  // 앱으로 돌아올 때 Gist 자동 재동기화
+  useEffect(() => {
+    let lastHidden = 0;
+    const onVisible = () => {
+      if (document.hidden) { lastHidden = Date.now(); return; }
+      const away = Date.now() - lastHidden;
+      const t = token || localStorage.getItem(LS_TOKEN);
+      const g = gistId || localStorage.getItem(LS_GISTID);
+      if (!t || !g || away < 3000) return; // 3초 이상 떠난 경우만
+      setSyncState("syncing"); setSyncMsg("불러오는 중…");
+      gistRead(t, g)
+        .then((remote) => {
+          if (remote.categories?.length) setCategories(remote.categories);
+          if (remote.entries) setEntries(remote.entries);
+          if (remote.alarms) setAlarms(remote.alarms);
+          if (remote.orbCategories?.length) setOrbCategories(remote.orbCategories);
+          if (Array.isArray(remote.actions) && remote.actions.length) setActions(remote.actions);
+          if (remote.orbs && Object.keys(remote.orbs).length) setOrbs(remote.orbs);
+          if (remote.archives && Object.keys(remote.archives).length) setArchives(remote.archives);
+          setSyncState("ok"); setSyncMsg("동기화됨 ✓");
+          setTimeout(() => setSyncState("idle"), 1600);
+        })
+        .catch(() => { setSyncState("warn"); setSyncMsg("동기화 실패"); });
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => document.removeEventListener("visibilitychange", onVisible);
+  }, [token, gistId]);
+
   // 초기 로드
   useEffect(() => {
     try {
