@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="theme-color" content="#4a7c59" />
 <title>작업 일지</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -21,6 +24,12 @@
     --card: #fff;
     --font-display: 'Gowun Batang', serif;
     --font-body: 'Gothic A1', sans-serif;
+    --wood: #a47551;
+    --wood-deep: #6b4423;
+    --wood-light: #d4a574;
+    --green: #4a7c59;
+    --green-deep: #2d5238;
+    --green-soft: #d4e4d4;
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { margin: 0; padding: 0; }
@@ -34,12 +43,13 @@
   }
   .wrap { max-width: 880px; margin: 0 auto; padding: 24px 16px 80px; }
 
-  /* 탭 바 */
-  .tab-bar { display: flex; gap: 6px; background: #f1e8d8; border: 1px solid var(--line); border-radius: 12px; padding: 4px; margin-bottom: 18px; }
-  .tab-btn { flex: 1; border: none; background: transparent; padding: 9px 8px; border-radius: 9px; font-family: var(--font-body); font-size: 14px; font-weight: 700; color: var(--muted); }
+  /* ===== 탭 바 ===== */
+  .tab-bar { display: flex; gap: 4px; background: #f1e8d8; border: 1px solid var(--line); border-radius: 12px; padding: 3px; margin-bottom: 18px; }
+  .tab-btn { flex: 1; border: none; background: transparent; padding: 8px 4px; border-radius: 9px; font-family: var(--font-body); font-size: 12.5px; font-weight: 700; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .tab-btn.on { background: var(--card); color: var(--accent); box-shadow: 0 1px 3px #0000000f; }
+  .tab-btn.on-green { background: var(--card); color: var(--green-deep); box-shadow: 0 1px 3px #0000000f; }
 
-  /* 거짓 경보 */
+  /* ===== 거짓 경보 ===== */
   .alarm-headline { background: linear-gradient(160deg, #fff, #fdfaf4); border: 1px solid var(--line); border-radius: 18px; padding: 20px; margin-bottom: 16px; text-align: center; }
   .alarm-headline .lead { color: var(--muted); font-size: 13px; margin-bottom: 10px; }
   .alarm-nums { display: flex; align-items: center; justify-content: center; gap: 14px; }
@@ -97,6 +107,8 @@
   button, .btn { font-family: var(--font-body); cursor: pointer; }
   .ghost-btn { background: var(--card); color: #7a6c57; border: 1px solid var(--line-strong); border-radius: 10px; padding: 8px 14px; font-size: 13px; font-weight: 500; }
   .ghost-btn:active { transform: scale(.97); }
+  .green-btn { background: var(--green); color: #fff; border: none; border-radius: 10px; padding: 9px 18px; font-size: 14px; font-weight: 700; }
+  .green-btn:active { transform: scale(.97); }
   .primary-btn { background: var(--accent); color: #fff; border: none; border-radius: 10px; padding: 9px 18px; font-size: 14px; font-weight: 700; }
   .primary-btn:active { transform: scale(.97); }
 
@@ -150,7 +162,7 @@
 
   .backup-row { display: flex; gap: 10px; justify-content: center; margin-top: 8px; flex-wrap: wrap; }
 
-  /* 모달 */
+  /* ===== 모달 ===== */
   .overlay { position: fixed; inset: 0; background: #2a201788; display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 50; backdrop-filter: blur(2px); }
   .modal { background: var(--paper); border-radius: 18px; width: 100%; max-width: 480px; max-height: 88vh; display: flex; flex-direction: column; box-shadow: 0 20px 60px #00000040; border: 1px solid var(--line-strong); }
   .modal-head { display: flex; justify-content: space-between; align-items: center; padding: 18px 20px 12px; border-bottom: 1px solid var(--line); }
@@ -196,6 +208,7 @@
   .cat-name-input { flex: 1; min-width: 40px; border: none; background: transparent; font-size: 14px; color: var(--ink); padding: 2px 0; }
   .mini-tag { border: 1px solid var(--line-strong); background: #fff; border-radius: 16px; padding: 3px 10px; font-size: 11px; color: var(--muted); }
   .mini-tag.on { background: var(--accent-soft); color: var(--accent); border-color: #f0c9a8; font-weight: 700; }
+  .mini-tag.on-green { background: var(--green-soft); color: var(--green-deep); border-color: #a8c9a8; font-weight: 700; }
   .del-btn { background: none; border: none; font-size: 22px; color: #cbb89d; line-height: 1; padding: 0 4px; }
 
   .field-label { font-size: 12px; color: var(--muted); margin: 12px 2px 4px; }
@@ -204,9 +217,62 @@
   ::-webkit-scrollbar { height: 8px; width: 8px; }
   ::-webkit-scrollbar-thumb { background: #d8cab4; border-radius: 8px; }
 
+  /* ===== 구슬 탭 ===== */
+  .orb-jar-wrap { display: flex; justify-content: center; margin-bottom: 8px; }
+  .orb-jar-canvas { display: block; max-width: 100%; border-radius: 0 0 18px 18px; }
+  .orb-summary { text-align: center; font-family: var(--font-display); font-size: 14px; color: var(--muted); margin-bottom: 16px; line-height: 1.7; min-height: 22px; }
+  .orb-cat-bar { display: flex; gap: 3px; background: var(--green-soft); border: 1px solid #c0d4c0; border-radius: 10px; padding: 3px; margin-bottom: 14px; }
+  .orb-cat-btn { flex: 1; border: none; background: transparent; padding: 8px 4px; border-radius: 8px; font-family: var(--font-body); font-size: 12.5px; font-weight: 700; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .orb-cat-btn.on { background: var(--card); color: var(--green-deep); box-shadow: 0 1px 3px #0000000f; }
+  .orb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 8px; margin-bottom: 14px; }
+  .orb-action-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-height: 68px; min-width: 44px; border: 1.5px solid var(--line-strong); border-radius: 14px; background: #fdfbf6; font-family: var(--font-body); color: var(--ink); user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; touch-action: manipulation; padding: 6px 4px; transition: transform .08s; }
+  .orb-action-btn:active { transform: scale(.91); }
+  .orb-action-btn.golden-border { border-color: var(--wood-light); background: linear-gradient(160deg, #fdfaf4, #fdf3e0); box-shadow: 0 0 0 1px #d4a57422; }
+  .orb-action-icon { font-size: 22px; line-height: 1.1; }
+  .orb-action-name { font-size: 10px; color: var(--muted); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 2px; text-align: center; }
+  .orb-routine-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+  .orb-empty-msg { text-align: center; color: var(--faint); font-size: 13px; padding: 20px 8px; line-height: 1.7; }
+  .orb-manage-row { display: flex; gap: 8px; justify-content: center; margin-top: 6px; margin-bottom: 16px; }
+
+  /* ===== 크기 선택 ===== */
+  .size-picker-overlay { position: fixed; inset: 0; z-index: 60; background: transparent; }
+  .size-picker { position: fixed; background: var(--card); border: 1px solid var(--line-strong); border-radius: 16px; padding: 10px 12px; box-shadow: 0 8px 28px #00000030; z-index: 61; display: flex; gap: 10px; }
+  .size-opt { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 6px; border-radius: 12px; border: 1px solid var(--line); background: #fdfbf6; min-width: 50px; font-family: var(--font-body); }
+  .size-opt:active { transform: scale(.9); background: var(--green-soft); }
+  .size-label { font-size: 10px; color: var(--muted); }
+
+  /* ===== 아카이브 탭 ===== */
+  .archive-current { background: linear-gradient(160deg, #fff, #f8f5ee); border: 1px solid var(--line); border-radius: 18px; padding: 20px; margin-bottom: 18px; text-align: center; box-shadow: 0 2px 8px #0000000d; }
+  .archive-current-title { font-family: var(--font-display); font-size: 17px; color: var(--ink-deep); margin-bottom: 14px; }
+  .archive-mini-jar { display: inline-flex; flex-wrap: wrap; gap: 3px; justify-content: center; align-content: flex-end; min-height: 60px; padding: 10px 12px; border: 2px solid var(--wood-light); border-top: 2px dashed var(--line-strong); border-radius: 0 0 20px 20px; min-width: 100px; max-width: 220px; }
+  .archive-golden-orb { border-radius: 50%; background: radial-gradient(circle at 35% 35%, #fef3c7, #d97706); box-shadow: 0 0 4px #fbbf2444; }
+  .archive-count { font-family: var(--font-display); font-size: 24px; color: var(--wood); margin-top: 10px; }
+  .archive-month-label { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .archive-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+  .archive-card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px 12px; text-align: center; box-shadow: 0 1px 4px #0000000a; }
+  .archive-card-title { font-family: var(--font-display); font-size: 15px; color: var(--ink-deep); margin-bottom: 4px; }
+  .archive-card-count { font-size: 13px; color: var(--wood); font-weight: 700; }
+  .archive-card-jar { display: inline-flex; flex-wrap: wrap; gap: 2px; justify-content: center; align-content: flex-end; min-height: 36px; padding: 6px 8px; border: 1.5px solid var(--wood-light); border-top: 1.5px dashed var(--line); border-radius: 0 0 14px 14px; margin-bottom: 6px; min-width: 60px; }
+
+  /* ===== 루틴 패턴 ===== */
+  .routine-section { margin-top: 16px; }
+
+  /* ===== 구슬 관리 모달 추가 ===== */
+  .orb-select { border: 1px solid var(--line-strong); border-radius: 8px; padding: 6px 8px; font-size: 13px; background: #fff; color: var(--ink); font-family: var(--font-body); flex-shrink: 0; }
+  .orb-select:focus { outline: 2px solid var(--green)33; border-color: var(--green); }
+  .orb-cat-section { margin-bottom: 10px; }
+  .orb-cat-section-head { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); margin-bottom: 4px; padding: 2px 0; }
+  .orb-cat-section-swatch { width: 8px; height: 8px; border-radius: 3px; }
+
+  /* ===== 퀵 추가 인라인 ===== */
+  .orb-quick-row { display: flex; gap: 6px; margin-bottom: 14px; }
+  .orb-quick-input { flex: 1; border: 1px solid var(--line-strong); border-radius: 10px; padding: 7px 10px; font-size: 13px; background: #fff; color: var(--ink); font-family: var(--font-body); }
+  .orb-quick-input:focus { outline: 2px solid var(--green)33; border-color: var(--green); }
+
   @media (max-width: 480px) {
     h1 { font-size: 26px; }
     .stat-num { font-size: 20px; }
+    .tab-btn { font-size: 12px; padding: 7px 2px; }
   }
 </style>
 </head>
@@ -216,6 +282,27 @@
 <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://unpkg.com/matter-js@0.20.0/build/matter.min.js"></script>
+
+<script>
+(function(){
+  try {
+    var iconSvg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='40' fill='%234a7c59'/%3E%3Ccircle cx='96' cy='90' r='32' fill='%23fde68a' opacity='.9'/%3E%3Ccircle cx='70' cy='118' r='18' fill='%23d4a574' opacity='.7'/%3E%3Ccircle cx='122' cy='122' r='14' fill='%230e7490' opacity='.7'/%3E%3C/svg%3E";
+    var m = JSON.stringify({name:"작업 일지",short_name:"일지",display:"standalone",start_url:".",theme_color:"#4a7c59",background_color:"#faf6ef",icons:[{src:iconSvg,sizes:"192x192",type:"image/svg+xml",purpose:"any"}]});
+    var b = new Blob([m],{type:"application/json"});
+    var lnk = document.createElement("link");
+    lnk.rel = "manifest";
+    lnk.href = URL.createObjectURL(b);
+    document.head.appendChild(lnk);
+  } catch(e){}
+  if ("serviceWorker" in navigator) {
+    try {
+      var sw = "self.addEventListener('install',function(e){self.skipWaiting()});self.addEventListener('activate',function(e){e.waitUntil(self.clients.claim())});self.addEventListener('fetch',function(e){e.respondWith(fetch(e.request).catch(function(){return caches.match(e.request)}))})";
+      navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:"application/javascript"}))).catch(function(){});
+    } catch(e){}
+  }
+})();
+</script>
 
 <script type="text/babel" data-presets="react">
 const { useState, useEffect, useMemo, useCallback, useRef } = React;
@@ -229,10 +316,20 @@ const DEFAULT_CATEGORIES = [
   { id: "s1", name: "스토어관리", color: PALETTE[6], isWork: false },
   { id: "s2", name: "배송", color: PALETTE[8], isWork: false },
 ];
+const DEFAULT_ORB_CATEGORIES = [
+  { id: "oc1", name: "창작", color: "#4a7c59" },
+  { id: "oc2", name: "운영", color: "#b45309" },
+  { id: "oc3", name: "집안일", color: "#0e7490" },
+  { id: "oc4", name: "일상·이동", color: "#6d28d9" },
+];
 const LS_DATA = "worklog:data:v1";
 const LS_TOKEN = "worklog:gh_token:v1";
 const LS_GISTID = "worklog:gist_id:v1";
+const LS_LAST_TAB = "worklog:last_tab:v1";
 const GIST_FILENAME = "worklog-data.json";
+const ORB_SIZES = { s: 7, m: 11, l: 16, xl: 22 };
+const ORB_SIZE_LABELS = { s: "작은", m: "중간", l: "큰", xl: "아주 큰" };
+const hasMatter = typeof Matter !== "undefined";
 
 // ===================== 날짜 유틸 =====================
 const pad = (n) => String(n).padStart(2, "0");
@@ -243,6 +340,14 @@ const WEEKDAYS = ["일","월","화","수","목","금","토"];
 const MONTHS = ["1월","2월","3월","4월","5월","6월","7월","8월","9월","10월","11월","12월"];
 let _uid = 0;
 const uid = (p="id") => `${p}_${Date.now().toString(36)}_${(_uid++).toString(36)}`;
+
+const lighten = (hex, amt) => {
+  if (!hex || hex[0] !== "#") return hex;
+  const r = Math.min(255, parseInt(hex.slice(1,3),16) + amt);
+  const g = Math.min(255, parseInt(hex.slice(3,5),16) + amt);
+  const b = Math.min(255, parseInt(hex.slice(5,7),16) + amt);
+  return `rgb(${r},${g},${b})`;
+};
 
 // ===================== Gist API =====================
 async function gistRead(token, gistId) {
@@ -284,23 +389,49 @@ async function gistWrite(token, gistId, payload) {
 
 // ===================== 메인 앱 =====================
 function App() {
-  const [tab, setTab] = useState("log"); // log | alarm
+  const isMobile = useMemo(() => window.matchMedia("(max-width: 768px)").matches, []);
+  const savedTab = useMemo(() => localStorage.getItem(LS_LAST_TAB), []);
+  const [tab, setTab] = useState(savedTab || (isMobile ? "orbs" : "log"));
   const [categories, setCategories] = useState(DEFAULT_CATEGORIES);
   const [entries, setEntries] = useState({});
-  const [alarms, setAlarms] = useState([]); // 거짓 경보 기록 [{t, fear, real, dur, note}]
+  const [alarms, setAlarms] = useState([]);
+  const [orbCategories, setOrbCategories] = useState(DEFAULT_ORB_CATEGORIES);
+  const [actions, setActions] = useState([]);
+  const [orbs, setOrbs] = useState({});
+  const [archives, setArchives] = useState({});
+  const [currentDate, setCurrentDate] = useState(todayStr);
   const [cursor, setCursor] = useState(() => { const n = new Date(); return { year: n.getFullYear(), month: n.getMonth() }; });
   const [selectedDate, setSelectedDate] = useState(null);
   const [manageOpen, setManageOpen] = useState(false);
+  const [orbManageOpen, setOrbManageOpen] = useState(false);
   const [syncOpen, setSyncOpen] = useState(false);
 
   const [token, setToken] = useState(() => localStorage.getItem(LS_TOKEN) || "");
   const [gistId, setGistId] = useState(() => localStorage.getItem(LS_GISTID) || "");
-  const [syncState, setSyncState] = useState("idle"); // idle | syncing | ok | warn
+  const [syncState, setSyncState] = useState("idle");
   const [syncMsg, setSyncMsg] = useState("");
   const loadedRef = useRef(false);
   const writeTimer = useRef(null);
 
-  // 초기 로드: 로컬 캐시 먼저, 그 다음 Gist로 덮어쓰기
+  useEffect(() => { localStorage.setItem(LS_LAST_TAB, tab); }, [tab]);
+
+  // 자정 리셋
+  useEffect(() => {
+    let lastDate = todayStr();
+    const interval = setInterval(() => {
+      const now = todayStr();
+      if (now !== lastDate) {
+        if (now.substring(0,7) !== lastDate.substring(0,7)) {
+          setArchives((prev) => ({...prev, [lastDate.substring(0,7)]: { closedAt: Date.now() }}));
+        }
+        lastDate = now;
+        setCurrentDate(now);
+      }
+    }, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // 초기 로드
   useEffect(() => {
     try {
       const raw = localStorage.getItem(LS_DATA);
@@ -309,6 +440,10 @@ function App() {
         if (data.categories?.length) setCategories(data.categories);
         if (data.entries) setEntries(data.entries);
         if (data.alarms) setAlarms(data.alarms);
+        if (data.orbCategories?.length) setOrbCategories(data.orbCategories);
+        if (Array.isArray(data.actions)) setActions(data.actions);
+        if (data.orbs) setOrbs(data.orbs);
+        if (data.archives) setArchives(data.archives);
       }
     } catch (e) {}
     loadedRef.current = true;
@@ -320,6 +455,10 @@ function App() {
           if (data.categories?.length) setCategories(data.categories);
           if (data.entries) setEntries(data.entries);
           if (data.alarms) setAlarms(data.alarms);
+          if (data.orbCategories?.length) setOrbCategories(data.orbCategories);
+          if (Array.isArray(data.actions)) setActions(data.actions);
+          if (data.orbs) setOrbs(data.orbs);
+          if (data.archives) setArchives(data.archives);
           setSyncState("ok"); setSyncMsg("동기화됨 ✓");
           setTimeout(() => setSyncState("idle"), 1600);
         })
@@ -327,10 +466,10 @@ function App() {
     }
   }, []); // eslint-disable-line
 
-  // 저장: 로컬 항상 + (연결됐으면) Gist 디바운스
+  // 저장
   useEffect(() => {
     if (!loadedRef.current) return;
-    const payload = { categories, entries, alarms, updatedAt: Date.now() };
+    const payload = { categories, entries, alarms, orbCategories, actions, orbs, archives, updatedAt: Date.now() };
     try { localStorage.setItem(LS_DATA, JSON.stringify(payload)); } catch (e) {}
 
     if (token) {
@@ -345,7 +484,7 @@ function App() {
         } catch (err) { setSyncState("warn"); setSyncMsg("저장 실패"); console.warn(err); }
       }, 1200);
     }
-  }, [categories, entries, alarms, token, gistId]);
+  }, [categories, entries, alarms, orbCategories, actions, orbs, archives, token, gistId]);
 
   // 월 그리드
   const monthInfo = useMemo(() => {
@@ -422,7 +561,6 @@ function App() {
     });
   };
 
-  // 거짓 경보에서 그날 작품 기록에 글자 수를 더함 (기존 기록 보존, 글자 수는 합산)
   const addWorkRecord = (dateStr, catId, words, note) => {
     if (!catId) return;
     setEntries((prev) => {
@@ -440,8 +578,50 @@ function App() {
     });
   };
 
+  // 구슬 카테고리 관리
+  const addOrbCategory = (name) => {
+    const used = new Set(orbCategories.map((c) => c.color));
+    const color = PALETTE.find((p) => !used.has(p)) || PALETTE[orbCategories.length % PALETTE.length];
+    setOrbCategories((prev) => [...prev, { id: uid("oc"), name, color }]);
+  };
+  const updateOrbCategory = (id, patch) => setOrbCategories((prev) => prev.map((c) => c.id===id ? {...c,...patch} : c));
+  const removeOrbCategory = (id) => {
+    setOrbCategories((prev) => prev.filter((c) => c.id!==id));
+    setActions((prev) => prev.filter((a) => a.categoryId !== id));
+  };
+
+  // 행동 관리
+  const addAction = (catId, name, icon) => {
+    setActions((prev) => [...prev, { id: uid("a"), categoryId: catId, name, icon: icon || "", isSpecial: false, isRoutine: false }]);
+  };
+  const updateAction = (id, patch) => setActions((prev) => prev.map((a) => a.id===id ? {...a,...patch} : a));
+  const removeAction = (id) => setActions((prev) => prev.filter((a) => a.id!==id));
+
+  // 구슬 추가
+  const addOrb = useCallback((categoryId, actionId, size, special) => {
+    const ds = currentDate;
+    setOrbs((prev) => {
+      const next = {...prev};
+      const day = [...(next[ds] || [])];
+      day.push({ id: uid("o"), categoryId, actionId, size, special: !!special, t: Date.now() });
+      next[ds] = day;
+      return next;
+    });
+  }, [currentDate]);
+
+  // 황금 구슬 수 계산
+  const goldenForMonth = useCallback((ym) => {
+    let count = 0;
+    for (const ds in orbs) {
+      if (ds.startsWith(ym)) {
+        count += orbs[ds].filter((o) => o.special).length;
+      }
+    }
+    return count;
+  }, [orbs]);
+
   const exportData = () => {
-    const blob = new Blob([JSON.stringify({ categories, entries }, null, 2)], { type: "application/json" });
+    const blob = new Blob([JSON.stringify({ categories, entries, orbCategories, actions, orbs, archives }, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url; a.download = `worklog-backup-${todayStr()}.json`; a.click();
@@ -453,6 +633,10 @@ function App() {
       try { const data = JSON.parse(reader.result);
         if (data.categories?.length) setCategories(data.categories);
         if (data.entries) setEntries(data.entries);
+        if (data.orbCategories?.length) setOrbCategories(data.orbCategories);
+        if (Array.isArray(data.actions)) setActions(data.actions);
+        if (data.orbs) setOrbs(data.orbs);
+        if (data.archives) setArchives(data.archives);
       } catch (e) { alert("백업 파일을 읽을 수 없어요."); }
     };
     reader.readAsText(file);
@@ -484,10 +668,13 @@ function App() {
         if (data.categories?.length) setCategories(data.categories);
         if (data.entries) setEntries(data.entries);
         if (data.alarms) setAlarms(data.alarms);
+        if (data.orbCategories?.length) setOrbCategories(data.orbCategories);
+        if (Array.isArray(data.actions)) setActions(data.actions);
+        if (data.orbs) setOrbs(data.orbs);
+        if (data.archives) setArchives(data.archives);
         setSyncState("ok"); setSyncMsg("동기화됨 ✓"); setTimeout(() => setSyncState("idle"), 1600);
       })
       .catch(() => {
-        // gistId가 없으면 첫 저장 때 새로 만들어짐
         setSyncState("idle"); setSyncMsg("");
       });
   };
@@ -499,23 +686,29 @@ function App() {
 
   const syncClass = { idle: "sync-idle", syncing: "sync-sync", ok: "sync-ok", warn: "sync-warn" }[syncState];
 
+  const titles = { log: "작업 일지", orbs: "오늘의 구슬", alarm: "거짓 경보", archive: "아카이브" };
+  const subtitles = { log: "매일의 작업을 기록하고, 이어지는 흐름을 봅니다", orbs: "오두막 일지 — 오늘 한 일을 구슬로 모아요", alarm: "시작 전 공포와 실제 사이의 거리를 기록해요", archive: "황금 구슬이 모이는 보관함" };
+
   return (
     <div className="wrap">
       <header>
         <div>
-          <h1>{tab==="log" ? "작업 일지" : "거짓 경보"}</h1>
-          <p className="subtitle">{tab==="log" ? "매일의 작업을 기록하고, 이어지는 흐름을 봅니다" : "시작 전 공포와 실제 사이의 거리를 기록해요"}</p>
+          <h1>{titles[tab]}</h1>
+          <p className="subtitle">{subtitles[tab]}</p>
         </div>
         <div className="header-right">
           <span className={`sync-badge ${syncClass}`}>{syncMsg}</span>
-          <button className="ghost-btn" onClick={() => setSyncOpen(true)}>{token ? "동기화 ✓" : "동기화 설정"}</button>
+          <button className="ghost-btn" onClick={() => setSyncOpen(true)}>{token ? "동기화 ✓" : "동기화"}</button>
           {tab==="log" && <button className="ghost-btn" onClick={() => setManageOpen(true)}>항목 관리</button>}
+          {tab==="orbs" && <button className="ghost-btn" onClick={() => setOrbManageOpen(true)}>구슬 관리</button>}
         </div>
       </header>
 
       <div className="tab-bar">
         <button className={`tab-btn${tab==="log" ? " on" : ""}`} onClick={() => setTab("log")}>작업 일지</button>
+        <button className={`tab-btn${tab==="orbs" ? " on-green" : ""}`} onClick={() => setTab("orbs")}>구슬</button>
         <button className={`tab-btn${tab==="alarm" ? " on" : ""}`} onClick={() => setTab("alarm")}>거짓 경보</button>
+        <button className={`tab-btn${tab==="archive" ? " on-green" : ""}`} onClick={() => setTab("archive")}>보관함</button>
       </div>
 
       {tab==="log" && (<React.Fragment>
@@ -544,7 +737,7 @@ function App() {
           <div key={wi} className="week-row">
             {week.map((date, di) => {
               if (!date) return <div key={di} className="day-empty" />;
-              const ds = ymd(date); const colors = dayHasAny(ds); const words = dayWordCount(ds); const isToday = ds===todayStr();
+              const ds = ymd(date); const colors = dayHasAny(ds); const words = dayWordCount(ds); const isToday = ds===currentDate;
               return (
                 <button key={di} className={`day${isToday ? " today" : ""}`} onClick={() => setSelectedDate(ds)}>
                   <span className="day-num" style={{ color: di===0 ? "#b91c1c" : di===6 ? "#1d4ed8" : "#3a3027", fontWeight: isToday ? 800 : 500 }}>{date.getDate()}</span>
@@ -616,9 +809,18 @@ function App() {
       </div>
       </React.Fragment>)}
 
+      {tab==="orbs" && (
+        <OrbsTab currentDate={currentDate} orbCategories={orbCategories} actions={actions} orbs={orbs}
+          onAddOrb={addOrb} onAddAction={addAction} onManage={() => setOrbManageOpen(true)} />
+      )}
+
       {tab==="alarm" && (
         <AlarmTab alarms={alarms} workCats={categories.filter((c) => c.isWork)} onAddWork={addWorkRecord}
           onAdd={(rec) => setAlarms((prev) => [...prev, rec])} onClear={() => setAlarms([])} />
+      )}
+
+      {tab==="archive" && (
+        <ArchiveTab orbs={orbs} archives={archives} orbCategories={orbCategories} currentDate={currentDate} goldenForMonth={goldenForMonth} />
       )}
 
       {selectedDate && (
@@ -628,6 +830,12 @@ function App() {
       )}
       {manageOpen && (
         <CategoryManager categories={categories} onAdd={addCategory} onUpdate={updateCategory} onRemove={removeCategory} onReorder={reorderCategory} onClose={() => setManageOpen(false)} />
+      )}
+      {orbManageOpen && (
+        <OrbActionManager orbCategories={orbCategories} actions={actions}
+          onAddCategory={addOrbCategory} onUpdateCategory={updateOrbCategory} onRemoveCategory={removeOrbCategory}
+          onAddAction={addAction} onUpdateAction={updateAction} onRemoveAction={removeAction}
+          onClose={() => setOrbManageOpen(false)} />
       )}
       {syncOpen && (
         <SyncManager token={token} gistId={gistId} onConnect={connectGist} onDisconnect={disconnectGist} onClose={() => setSyncOpen(false)} />
@@ -726,7 +934,7 @@ function CategoryManager({ categories, onAdd, onUpdate, onRemove, onReorder, onC
             <button className={`toggle-btn${isWork ? " on" : ""}`} onClick={() => setIsWork((v) => !v)}>{isWork ? "작품 ✓" : "일반"}</button>
             <button className="primary-btn" onClick={handleAdd}>추가</button>
           </div>
-          <p className="hint">색칠된 사각형을 누르면 색을 바꿀 수 있어요. 손잡이(⋮⋮)를 끌거나 ↑↓ 버튼으로 순서를 바꿉니다.</p>
+          <p className="hint">색칠된 사각형을 누르면 색을 바꿀 수 있어요. 손잡이를 끌거나 버튼으로 순서를 바꿉니다.</p>
           <div className="cat-list">
             {categories.map((c, idx) => (
               <div key={c.id}
@@ -1004,6 +1212,546 @@ function AlarmTab({ alarms, workCats, onAddWork, onAdd, onClear }) {
     </div>
   );
 }
+
+
+// ===================== 구슬 탭 =====================
+function OrbsTab({ currentDate, orbCategories, actions, orbs, onAddOrb, onAddAction, onManage }) {
+  const [selCat, setSelCat] = useState(orbCategories[0]?.id || "");
+  const [sizePicker, setSizePicker] = useState(null);
+  const [quickName, setQuickName] = useState("");
+  const pressTimer = useRef(null);
+  const pressStartPos = useRef(null);
+
+  const todayOrbs = useMemo(() => orbs[currentDate] || [], [orbs, currentDate]);
+  const catActions = useMemo(() => actions.filter((a) => a.categoryId === selCat), [actions, selCat]);
+
+  const summary = useMemo(() => {
+    if (todayOrbs.length === 0) return "오늘 아직 구슬이 없어요";
+    const counts = {};
+    todayOrbs.forEach((o) => {
+      const cat = orbCategories.find((c) => c.id === o.categoryId);
+      if (cat) counts[cat.name] = (counts[cat.name] || 0) + 1;
+    });
+    const parts = Object.entries(counts).map(([n, c]) => `${n} 구슬 ${c}개`);
+    return `오늘 ${parts.join(", ")}를 모았습니다`;
+  }, [todayOrbs, orbCategories]);
+
+  const handleTap = (action) => {
+    onAddOrb(action.categoryId, action.id, "m", action.isSpecial);
+  };
+
+  const handlePointerDown = (action, e) => {
+    pressStartPos.current = { x: e.clientX || 0, y: e.clientY || 0 };
+    pressTimer.current = setTimeout(() => {
+      pressTimer.current = null;
+      const rect = e.currentTarget.getBoundingClientRect();
+      setSizePicker({ action, x: rect.left, y: rect.top - 80 });
+    }, 500);
+  };
+
+  const handlePointerUp = (action) => {
+    if (pressTimer.current) {
+      clearTimeout(pressTimer.current);
+      pressTimer.current = null;
+      handleTap(action);
+    }
+  };
+
+  const handlePointerMove = (e) => {
+    if (pressTimer.current && pressStartPos.current) {
+      const dx = (e.clientX || 0) - pressStartPos.current.x;
+      const dy = (e.clientY || 0) - pressStartPos.current.y;
+      if (Math.abs(dx) > 10 || Math.abs(dy) > 10) {
+        clearTimeout(pressTimer.current);
+        pressTimer.current = null;
+      }
+    }
+  };
+
+  const handlePointerCancel = () => {
+    if (pressTimer.current) { clearTimeout(pressTimer.current); pressTimer.current = null; }
+  };
+
+  const handleSizeSelect = (size) => {
+    if (sizePicker) {
+      onAddOrb(sizePicker.action.categoryId, sizePicker.action.id, size, sizePicker.action.isSpecial);
+      setSizePicker(null);
+    }
+  };
+
+  const handleQuickAdd = () => {
+    if (!quickName.trim() || !selCat) return;
+    onAddAction(selCat, quickName.trim(), "");
+    setQuickName("");
+  };
+
+  // 루틴 액션 데이터
+  const routineActions = useMemo(() => actions.filter((a) => a.isRoutine), [actions]);
+
+  return (
+    <div>
+      <OrbJar todayOrbs={todayOrbs} orbCategories={orbCategories} currentDate={currentDate} />
+      <div className="orb-summary">{summary}</div>
+
+      <div className="orb-cat-bar">
+        {orbCategories.map((c) => (
+          <button key={c.id} className={`orb-cat-btn${selCat===c.id ? " on" : ""}`} onClick={() => setSelCat(c.id)}>
+            {c.name}
+          </button>
+        ))}
+      </div>
+
+      {catActions.length === 0 ? (
+        <div className="orb-empty-msg">이 카테고리에 행동이 없어요.<br/>아래에서 추가하거나, 상단 '구슬 관리'에서 설정하세요.</div>
+      ) : (
+        <div className="orb-grid">
+          {catActions.map((a) => (
+            <button key={a.id}
+              className={`orb-action-btn${a.isSpecial ? " golden-border" : ""}`}
+              onPointerDown={(e) => handlePointerDown(a, e)}
+              onPointerUp={() => handlePointerUp(a)}
+              onPointerMove={handlePointerMove}
+              onPointerCancel={handlePointerCancel}
+              onPointerLeave={handlePointerCancel}
+              onContextMenu={(e) => e.preventDefault()}
+            >
+              <span className="orb-action-icon">{a.icon || a.name[0]}</span>
+              <span className="orb-action-name">{a.name}</span>
+              {a.isRoutine && <span className="orb-routine-dot" />}
+            </button>
+          ))}
+        </div>
+      )}
+
+      <div className="orb-quick-row">
+        <input className="orb-quick-input" placeholder="새 행동 이름 (현재 카테고리에 추가)" value={quickName}
+          onChange={(e) => setQuickName(e.target.value)} onKeyDown={(e) => e.key==="Enter" && handleQuickAdd()} />
+        <button className="green-btn" onClick={handleQuickAdd} style={{padding:"8px 14px", fontSize:13}}>추가</button>
+      </div>
+
+      <div className="orb-manage-row">
+        <button className="ghost-btn" onClick={onManage}>구슬 관리</button>
+      </div>
+
+      {sizePicker && (
+        <React.Fragment>
+          <div className="size-picker-overlay" onClick={() => setSizePicker(null)} />
+          <div className="size-picker fade" style={{ left: Math.max(8, Math.min(sizePicker.x - 40, window.innerWidth - 260)), top: Math.max(8, sizePicker.y) }}>
+            {["s","m","l","xl"].map((sz) => (
+              <button key={sz} className="size-opt" onClick={() => handleSizeSelect(sz)}>
+                <div style={{ width: ORB_SIZES[sz]*2, height: ORB_SIZES[sz]*2, borderRadius: "50%", background: sizePicker.action.isSpecial ? "radial-gradient(circle at 35% 35%, #fef3c7, #d97706)" : `radial-gradient(circle at 35% 35%, ${lighten(orbCategories.find((c)=>c.id===sizePicker.action.categoryId)?.color||"#999", 60)}, ${orbCategories.find((c)=>c.id===sizePicker.action.categoryId)?.color||"#999"})` }} />
+                <span className="size-label">{ORB_SIZE_LABELS[sz]}</span>
+              </button>
+            ))}
+          </div>
+        </React.Fragment>
+      )}
+
+      {routineActions.length > 0 && (
+        <RoutineReport orbs={orbs} actions={routineActions} orbCategories={orbCategories} currentDate={currentDate} />
+      )}
+    </div>
+  );
+}
+
+
+// ===================== 유리병 (Matter.js) =====================
+function OrbJar({ todayOrbs, orbCategories, currentDate }) {
+  const canvasRef = useRef(null);
+  const engineRef = useRef(null);
+  const bodyMapRef = useRef(new Map());
+  const lastCountRef = useRef(0);
+  const rafRef = useRef(null);
+  const W = 300, H = 240;
+
+  const catColorMap = useMemo(() => {
+    const m = {};
+    orbCategories.forEach((c) => { m[c.id] = c.color; });
+    return m;
+  }, [orbCategories]);
+
+  const drawJar = useCallback((ctx) => {
+    const jl = 44, jr = W - 44, jt = 10, jb = H - 10, cr = 18;
+    ctx.beginPath();
+    ctx.moveTo(jl, jt);
+    ctx.lineTo(jl, jb - cr);
+    ctx.quadraticCurveTo(jl, jb, jl + cr, jb);
+    ctx.lineTo(jr - cr, jb);
+    ctx.quadraticCurveTo(jr, jb, jr, jb - cr);
+    ctx.lineTo(jr, jt);
+    ctx.strokeStyle = "rgba(164,117,81,0.35)";
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(jl + 6, jt + 14);
+    ctx.lineTo(jl + 6, jb - cr - 8);
+    ctx.strokeStyle = "rgba(255,255,255,0.25)";
+    ctx.lineWidth = 3;
+    ctx.lineCap = "round";
+    ctx.stroke();
+    ctx.lineCap = "butt";
+  }, []);
+
+  const drawMarble = useCallback((ctx, x, y, r, color, special) => {
+    ctx.save();
+    if (special) {
+      ctx.shadowColor = "#fbbf24";
+      ctx.shadowBlur = r * 0.7;
+    }
+    const grad = ctx.createRadialGradient(x - r*0.3, y - r*0.3, r*0.08, x, y, r);
+    if (special) {
+      grad.addColorStop(0, "#fef3c7");
+      grad.addColorStop(0.5, "#fde68a");
+      grad.addColorStop(1, "#d97706");
+    } else {
+      grad.addColorStop(0, lighten(color, 50));
+      grad.addColorStop(1, color);
+    }
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fillStyle = grad;
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.arc(x - r*0.25, y - r*0.25, r*0.28, 0, Math.PI*2);
+    ctx.fillStyle = "rgba(255,255,255,0.3)";
+    ctx.fill();
+    ctx.restore();
+  }, []);
+
+  const renderCanvas = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, W, H);
+    drawJar(ctx);
+
+    if (!engineRef.current) {
+      todayOrbs.forEach((orb, i) => {
+        const r = ORB_SIZES[orb.size] || ORB_SIZES.m;
+        const col = 6;
+        const x = 60 + (i % col) * 32 + 16;
+        const y = H - 26 - Math.floor(i / col) * 28;
+        drawMarble(ctx, x, Math.max(r+12, Math.min(y, H-r-12)), r, catColorMap[orb.categoryId] || "#999", orb.special);
+      });
+      return;
+    }
+
+    const bodies = Matter.Composite.allBodies(engineRef.current.world);
+    bodies.forEach((body) => {
+      if (body.isStatic) return;
+      const data = bodyMapRef.current.get(body.id);
+      if (!data) return;
+      drawMarble(ctx, body.position.x, body.position.y, data.radius, data.color, data.special);
+    });
+  }, [drawJar, drawMarble, todayOrbs, catColorMap]);
+
+  useEffect(() => {
+    if (!hasMatter) { renderCanvas(); return; }
+
+    const engine = Matter.Engine.create({ gravity: { x: 0, y: 1.2 } });
+    engineRef.current = engine;
+    bodyMapRef.current.clear();
+
+    const opts = { isStatic: true, friction: 0.6, restitution: 0.1 };
+    const walls = [
+      Matter.Bodies.rectangle(W/2, H - 4, W - 88, 14, opts),
+      Matter.Bodies.rectangle(42, H/2, 12, H, opts),
+      Matter.Bodies.rectangle(W - 42, H/2, 12, H, opts),
+    ];
+    Matter.Composite.add(engine.world, walls);
+
+    todayOrbs.forEach((orb) => {
+      const r = ORB_SIZES[orb.size] || ORB_SIZES.m;
+      const x = 60 + Math.random() * (W - 120);
+      const y = 30 + Math.random() * 80;
+      const body = Matter.Bodies.circle(x, y, r, { restitution: 0.3, friction: 0.5, density: 0.003 });
+      bodyMapRef.current.set(body.id, { color: catColorMap[orb.categoryId] || "#999", special: orb.special, radius: r });
+      Matter.Composite.add(engine.world, body);
+    });
+    lastCountRef.current = todayOrbs.length;
+
+    for (let i = 0; i < 250; i++) Matter.Engine.update(engine, 16);
+
+    let running = true;
+    const loop = () => {
+      if (!running) return;
+      Matter.Engine.update(engine, 16);
+      renderCanvas();
+      rafRef.current = requestAnimationFrame(loop);
+    };
+    rafRef.current = requestAnimationFrame(loop);
+
+    return () => {
+      running = false;
+      cancelAnimationFrame(rafRef.current);
+      Matter.Composite.clear(engine.world, false);
+      Matter.Engine.clear(engine);
+      engineRef.current = null;
+    };
+  }, [currentDate, todayOrbs.length]); // eslint-disable-line
+
+  useEffect(() => {
+    if (!hasMatter || !engineRef.current) return;
+    if (todayOrbs.length > lastCountRef.current) {
+      const newOrbs = todayOrbs.slice(lastCountRef.current);
+      newOrbs.forEach((orb) => {
+        const r = ORB_SIZES[orb.size] || ORB_SIZES.m;
+        const x = 80 + Math.random() * (W - 160);
+        const body = Matter.Bodies.circle(x, -r * 2, r, { restitution: 0.4, friction: 0.5, density: 0.003 });
+        bodyMapRef.current.set(body.id, { color: catColorMap[orb.categoryId] || "#999", special: orb.special, radius: r });
+        Matter.Composite.add(engineRef.current.world, body);
+      });
+      lastCountRef.current = todayOrbs.length;
+    }
+  }, [todayOrbs.length, catColorMap]);
+
+  return (
+    <div className="orb-jar-wrap">
+      <canvas ref={canvasRef} width={W} height={H} className="orb-jar-canvas" />
+    </div>
+  );
+}
+
+
+
+// ===================== 루틴 패턴 =====================
+function RoutineReport({ orbs, actions, orbCategories, currentDate }) {
+  const days = useMemo(() => {
+    const arr = [];
+    for (let i = 29; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      arr.push(ymd(d));
+    }
+    return arr;
+  }, [currentDate]);
+
+  const wasCompleted = (actionId, dateStr) => {
+    const day = orbs[dateStr];
+    if (!day) return false;
+    return day.some((o) => o.actionId === actionId);
+  };
+
+  return (
+    <section className="card routine-section">
+      <div className="gant-title">루틴 패턴</div>
+      <div className="gant-scroll">
+        <div style={{ minWidth: 92 + 30 * 22 }}>
+          <div className="gant-axis">
+            <div className="gant-row-label" />
+            <div className="gant-track">
+              {days.map((ds, i) => {
+                const d = parseYmd(ds);
+                return <div key={i} className="gant-tick">{d.getDate() % 3 === 1 ? d.getDate() : ""}</div>;
+              })}
+            </div>
+          </div>
+          {actions.map((act) => {
+            const cat = orbCategories.find((c) => c.id === act.categoryId);
+            return (
+              <div key={act.id} className="gant-row">
+                <div className="gant-row-label" title={act.name}>
+                  <span className="gant-swatch" style={{ background: cat?.color || "#999" }} />
+                  <span className="gant-name">{act.name}</span>
+                </div>
+                <div className="gant-track">
+                  {days.map((ds, di) => {
+                    const on = wasCompleted(act.id, ds);
+                    const prevOn = di > 0 && wasCompleted(act.id, days[di-1]);
+                    const nextOn = di < days.length - 1 && wasCompleted(act.id, days[di+1]);
+                    return (
+                      <div key={di} className="gant-cell">
+                        {on && (
+                          <div className="gant-bar" style={{
+                            background: cat?.color || "#999", opacity: 0.7,
+                            borderTopLeftRadius: prevOn ? 0 : 6, borderBottomLeftRadius: prevOn ? 0 : 6,
+                            borderTopRightRadius: nextOn ? 0 : 6, borderBottomRightRadius: nextOn ? 0 : 6,
+                            marginLeft: prevOn ? -2 : 0, marginRight: nextOn ? -2 : 0,
+                          }} />
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+
+// ===================== 아카이브 탭 =====================
+function ArchiveTab({ orbs, archives, orbCategories, currentDate, goldenForMonth }) {
+  const currentYM = currentDate.substring(0, 7);
+
+  const allMonths = useMemo(() => {
+    const set = new Set();
+    for (const ds in orbs) set.add(ds.substring(0, 7));
+    return [...set].sort().reverse();
+  }, [orbs]);
+
+  const pastMonths = useMemo(() => allMonths.filter((ym) => ym < currentYM), [allMonths, currentYM]);
+  const currentGolden = goldenForMonth(currentYM);
+
+  const ymLabel = (ym) => {
+    const [y, m] = ym.split("-");
+    return `${y}년 ${parseInt(m)}월`;
+  };
+
+  const goldenDots = (count, size) => {
+    const dots = [];
+    const show = Math.min(count, 40);
+    for (let i = 0; i < show; i++) {
+      dots.push(<div key={i} className="archive-golden-orb" style={{ width: size, height: size }} />);
+    }
+    return dots;
+  };
+
+  return (
+    <div>
+      <div className="archive-current">
+        <div className="archive-current-title">이달의 보관함</div>
+        <div className="archive-mini-jar">
+          {currentGolden === 0
+            ? <div style={{ color: "var(--faint)", fontSize: 12, padding: "8px 0" }}>아직 황금 구슬이 없어요</div>
+            : goldenDots(currentGolden, 14)}
+        </div>
+        <div className="archive-count">{currentGolden > 0 ? `황금 구슬 ${currentGolden}개` : ""}</div>
+        <div className="archive-month-label">{ymLabel(currentYM)}</div>
+      </div>
+
+      {pastMonths.length > 0 && (
+        <React.Fragment>
+          <div className="gant-title" style={{ marginBottom: 14 }}>지난 보관함</div>
+          <div className="archive-grid">
+            {pastMonths.map((ym) => {
+              const gc = goldenForMonth(ym);
+              return (
+                <div key={ym} className="archive-card">
+                  <div className="archive-card-jar">
+                    {gc === 0
+                      ? <div style={{ color: "var(--faint)", fontSize: 11, padding: "4px 0" }}>-</div>
+                      : goldenDots(gc, 10)}
+                  </div>
+                  <div className="archive-card-title">{ymLabel(ym)}</div>
+                  <div className="archive-card-count">황금 구슬 {gc}개</div>
+                </div>
+              );
+            })}
+          </div>
+        </React.Fragment>
+      )}
+
+      {pastMonths.length === 0 && currentGolden === 0 && (
+        <div className="empty">구슬 탭에서 핵심 행동을 기록하면<br/>황금 구슬이 여기에 모여요.</div>
+      )}
+    </div>
+  );
+}
+
+
+// ===================== 구슬 관리 모달 =====================
+function OrbActionManager({ orbCategories, actions, onAddCategory, onUpdateCategory, onRemoveCategory, onAddAction, onUpdateAction, onRemoveAction, onClose }) {
+  const [catName, setCatName] = useState("");
+  const [actCatId, setActCatId] = useState(orbCategories[0]?.id || "");
+  const [actName, setActName] = useState("");
+  const [actIcon, setActIcon] = useState("");
+  const [pickerId, setPickerId] = useState(null);
+
+  const handleAddCat = () => {
+    if (!catName.trim()) return;
+    onAddCategory(catName.trim());
+    setCatName("");
+  };
+
+  const handleAddAction = () => {
+    if (!actName.trim() || !actCatId) return;
+    onAddAction(actCatId, actName.trim(), actIcon.trim());
+    setActName(""); setActIcon("");
+  };
+
+  return (
+    <div className="overlay" onClick={onClose}>
+      <div className="modal" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-head"><div className="modal-date">구슬 관리</div><button className="close-btn" onClick={onClose}>×</button></div>
+        <div className="modal-body">
+          <div className="field-label">카테고리</div>
+          <div className="add-row" style={{ marginBottom: 10 }}>
+            <input className="add-input" placeholder="새 카테고리" value={catName}
+              onChange={(e) => setCatName(e.target.value)} onKeyDown={(e) => e.key==="Enter" && handleAddCat()} />
+            <button className="green-btn" style={{padding:"8px 14px", fontSize:13}} onClick={handleAddCat}>추가</button>
+          </div>
+          <div className="cat-list" style={{ marginBottom: 16 }}>
+            {orbCategories.map((c) => (
+              <div key={c.id} className="cat-item">
+                <button className="swatch-btn" style={{ background: c.color }} onClick={() => setPickerId(pickerId===c.id ? null : c.id)} />
+                <input className="cat-name-input" value={c.name} onChange={(e) => onUpdateCategory(c.id, { name: e.target.value })} />
+                <button className="del-btn" onClick={() => { if (confirm(c.name + " 카테고리와 소속 행동을 삭제할까요?")) onRemoveCategory(c.id); }}>×</button>
+                {pickerId===c.id && (
+                  <div className="color-pop" onClick={(e) => e.stopPropagation()}>
+                    <div className="color-grid">
+                      {PALETTE.map((p) => (
+                        <button key={p} className={`color-cell${c.color===p ? " sel" : ""}`} style={{ background: p }}
+                          onClick={() => { onUpdateCategory(c.id, { color: p }); setPickerId(null); }} />
+                      ))}
+                    </div>
+                    <label className="color-custom">직접 고르기<input type="color" value={c.color} onChange={(e) => onUpdateCategory(c.id, { color: e.target.value })} /></label>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          <div className="field-label">행동 추가</div>
+          <div className="add-row" style={{ marginBottom: 4 }}>
+            <select className="orb-select" value={actCatId} onChange={(e) => setActCatId(e.target.value)}>
+              {orbCategories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+            </select>
+            <input className="add-input" placeholder="행동 이름" value={actName} style={{flex:1}}
+              onChange={(e) => setActName(e.target.value)} onKeyDown={(e) => e.key==="Enter" && handleAddAction()} />
+            <input className="add-input" placeholder="아이콘" value={actIcon} style={{width:52, flex:"none"}}
+              onChange={(e) => setActIcon(e.target.value)} />
+            <button className="green-btn" style={{padding:"8px 14px", fontSize:13}} onClick={handleAddAction}>추가</button>
+          </div>
+          <p className="hint">아이콘은 이모지 한 글자 또는 비워두면 이름 첫 글자가 표시돼요.</p>
+
+          {orbCategories.map((cat) => {
+            const catActs = actions.filter((a) => a.categoryId === cat.id);
+            if (catActs.length === 0) return null;
+            return (
+              <div key={cat.id} className="orb-cat-section">
+                <div className="orb-cat-section-head">
+                  <span className="orb-cat-section-swatch" style={{ background: cat.color }} />
+                  {cat.name}
+                </div>
+                <div className="cat-list">
+                  {catActs.map((a) => (
+                    <div key={a.id} className="cat-item" style={{ gap: 6 }}>
+                      <span style={{ fontSize: 18, width: 28, textAlign: "center", flexShrink: 0 }}>{a.icon || a.name[0]}</span>
+                      <input className="cat-name-input" value={a.name} onChange={(e) => onUpdateAction(a.id, { name: e.target.value })} />
+                      <button className={`mini-tag${a.isSpecial ? " on" : ""}`} style={{ fontSize: 10 }}
+                        onClick={() => onUpdateAction(a.id, { isSpecial: !a.isSpecial })}>핵심</button>
+                      <button className={`mini-tag${a.isRoutine ? " on-green" : ""}`} style={{ fontSize: 10 }}
+                        onClick={() => onUpdateAction(a.id, { isRoutine: !a.isRoutine })}>루틴</button>
+                      <button className="del-btn" onClick={() => onRemoveAction(a.id)}>×</button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <div className="modal-foot"><button className="green-btn" onClick={onClose}>완료</button></div>
+      </div>
+    </div>
+  );
+}
+
 
 ReactDOM.createRoot(document.getElementById("root")).render(<App />);
 </script>
