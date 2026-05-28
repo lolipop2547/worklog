@@ -367,7 +367,7 @@ async function gistWrite(token, gistId, payload) {
   if (gistId) {
     const res = await fetch(`https://api.github.com/gists/${gistId}`, {
       method: "PATCH",
-      headers: { Authorization: `token ${token}`, Accept: "application/vnd.github+json" },
+      headers: { Authorization: `token ${token}`, Accept: "application/vnd.github+json", "Content-Type": "application/json" },
       body,
     });
     if (!res.ok) throw new Error(`Gist 저장 실패 (${res.status})`);
@@ -375,7 +375,7 @@ async function gistWrite(token, gistId, payload) {
   } else {
     const res = await fetch("https://api.github.com/gists", {
       method: "POST",
-      headers: { Authorization: `token ${token}`, Accept: "application/vnd.github+json" },
+      headers: { Authorization: `token ${token}`, Accept: "application/vnd.github+json", "Content-Type": "application/json" },
       body: JSON.stringify({
         description: "작업 일지 트래커 데이터",
         public: false,
@@ -412,6 +412,7 @@ function App() {
   const [syncMsg, setSyncMsg] = useState("");
   const loadedRef = useRef(false);
   const writeTimer = useRef(null);
+  const pendingPayloadRef = useRef(null);
 
   useEffect(() => { localStorage.setItem(LS_LAST_TAB, tab); }, [tab]);
 
@@ -451,14 +452,16 @@ function App() {
     if (token && gistId) {
       setSyncState("syncing"); setSyncMsg("불러오는 중…");
       gistRead(token, gistId)
-        .then((data) => {
-          if (data.categories?.length) setCategories(data.categories);
-          if (data.entries) setEntries(data.entries);
-          if (data.alarms) setAlarms(data.alarms);
-          if (data.orbCategories?.length) setOrbCategories(data.orbCategories);
-          if (Array.isArray(data.actions)) setActions(data.actions);
-          if (data.orbs) setOrbs(data.orbs);
-          if (data.archives) setArchives(data.archives);
+        .then((remote) => {
+          if (remote.categories?.length) setCategories(remote.categories);
+          if (remote.entries) setEntries(remote.entries);
+          if (remote.alarms) setAlarms(remote.alarms);
+          // 구슬 필드: 원격에 있으면 사용, 없으면(구버전 저장) 로컬 유지
+          if (remote.orbCategories?.length) setOrbCategories(remote.orbCategories);
+          if (Array.isArray(remote.actions) && remote.actions.length) setActions(remote.actions);
+          if (remote.orbs && Object.keys(remote.orbs).length) setOrbs(remote.orbs);
+          else if (!remote.orbs) setOrbs((local) => local); // 구버전이 날린 경우 로컬 보존
+          if (remote.archives && Object.keys(remote.archives).length) setArchives(remote.archives);
           setSyncState("ok"); setSyncMsg("동기화됨 ✓");
           setTimeout(() => setSyncState("idle"), 1600);
         })
@@ -473,9 +476,11 @@ function App() {
     try { localStorage.setItem(LS_DATA, JSON.stringify(payload)); } catch (e) {}
 
     if (token) {
+      pendingPayloadRef.current = payload;
       if (writeTimer.current) clearTimeout(writeTimer.current);
       setSyncState("syncing"); setSyncMsg("저장 중…");
       writeTimer.current = setTimeout(async () => {
+        pendingPayloadRef.current = null;
         try {
           const newId = await gistWrite(token, gistId, payload);
           if (!gistId && newId) { setGistId(newId); localStorage.setItem(LS_GISTID, newId); }
@@ -485,6 +490,33 @@ function App() {
       }, 1200);
     }
   }, [categories, entries, alarms, orbCategories, actions, orbs, archives, token, gistId]);
+
+  // 앱 이탈 시 미저장 Gist 즉시 전송
+  useEffect(() => {
+    const flushPending = () => {
+      const p = pendingPayloadRef.current;
+      const t = token || localStorage.getItem(LS_TOKEN);
+      const g = gistId || localStorage.getItem(LS_GISTID);
+      if (!p || !t || !g) return;
+      pendingPayloadRef.current = null;
+      if (writeTimer.current) { clearTimeout(writeTimer.current); writeTimer.current = null; }
+      const body = JSON.stringify({ files: { [GIST_FILENAME]: { content: JSON.stringify(p) } } });
+      try {
+        fetch(`https://api.github.com/gists/${g}`, {
+          method: "PATCH", keepalive: true,
+          headers: { Authorization: `token ${t}`, Accept: "application/vnd.github+json", "Content-Type": "application/json" },
+          body,
+        });
+      } catch (e) {}
+    };
+    const onVisChange = () => { if (document.hidden) flushPending(); };
+    document.addEventListener("visibilitychange", onVisChange);
+    window.addEventListener("beforeunload", flushPending);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisChange);
+      window.removeEventListener("beforeunload", flushPending);
+    };
+  }, [token, gistId]);
 
   // 월 그리드
   const monthInfo = useMemo(() => {
@@ -664,14 +696,14 @@ function App() {
     if (newGistId) { setGistId(newGistId); localStorage.setItem(LS_GISTID, newGistId); }
     setSyncState("syncing"); setSyncMsg("연결 중…");
     gistRead(newToken, newGistId || gistId)
-      .then((data) => {
-        if (data.categories?.length) setCategories(data.categories);
-        if (data.entries) setEntries(data.entries);
-        if (data.alarms) setAlarms(data.alarms);
-        if (data.orbCategories?.length) setOrbCategories(data.orbCategories);
-        if (Array.isArray(data.actions)) setActions(data.actions);
-        if (data.orbs) setOrbs(data.orbs);
-        if (data.archives) setArchives(data.archives);
+      .then((remote) => {
+        if (remote.categories?.length) setCategories(remote.categories);
+        if (remote.entries) setEntries(remote.entries);
+        if (remote.alarms) setAlarms(remote.alarms);
+        if (remote.orbCategories?.length) setOrbCategories(remote.orbCategories);
+        if (Array.isArray(remote.actions) && remote.actions.length) setActions(remote.actions);
+        if (remote.orbs && Object.keys(remote.orbs).length) setOrbs(remote.orbs);
+        if (remote.archives && Object.keys(remote.archives).length) setArchives(remote.archives);
         setSyncState("ok"); setSyncMsg("동기화됨 ✓"); setTimeout(() => setSyncState("idle"), 1600);
       })
       .catch(() => {
