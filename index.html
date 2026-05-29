@@ -978,7 +978,7 @@ function App() {
           onClose={() => setOrbManageOpen(false)} />
       )}
       {syncOpen && (
-        <SyncManager token={token} gistId={gistId} onConnect={connectGist} onDisconnect={disconnectGist} onClose={() => setSyncOpen(false)} />
+        <SyncManager token={token} gistId={gistId} onConnect={connectGist} onDisconnect={disconnectGist} onClose={() => setSyncOpen(false)} localOrbs={orbs} localEntries={entries} />
       )}
     </div>
   );
@@ -1120,9 +1120,33 @@ function CategoryManager({ categories, onAdd, onUpdate, onRemove, onReorder, onC
 }
 
 // ===================== 동기화 설정 =====================
-function SyncManager({ token, gistId, onConnect, onDisconnect, onClose }) {
+function SyncManager({ token, gistId, onConnect, onDisconnect, onClose, localOrbs, localEntries }) {
   const [t, setT] = useState(token); const [g, setG] = useState(gistId);
+  const [diag, setDiag] = useState(null);
   const handleConnect = () => { if (!t.trim()) { alert("토큰을 입력해 주세요."); return; } onConnect(t.trim(), g.trim()); };
+  const runDiag = async () => {
+    if (!token || !gistId) { setDiag("동기화 미연결"); return; }
+    setDiag("Gist 읽는 중…");
+    try {
+      const remote = await gistRead(token, gistId);
+      const localOrbDates = Object.keys(localOrbs || {});
+      const localOrbTotal = localOrbDates.reduce((s, d) => s + (localOrbs[d]?.length || 0), 0);
+      const remoteOrbs = remote.orbs || {};
+      const remoteOrbDates = Object.keys(remoteOrbs);
+      const remoteOrbTotal = remoteOrbDates.reduce((s, d) => s + (remoteOrbs[d]?.length || 0), 0);
+      const localEntryDates = Object.keys(localEntries || {});
+      const remoteEntryDates = Object.keys(remote.entries || {});
+      const ts = remote.updatedAt ? new Date(remote.updatedAt).toLocaleString() : "없음";
+      setDiag(
+        `[v7] Gist 최종 수정: ${ts}\n` +
+        `\n📋 작업일지: 로컬 ${localEntryDates.length}일 / Gist ${remoteEntryDates.length}일` +
+        `\n🔮 구슬: 로컬 ${localOrbTotal}개(${localOrbDates.length}일) / Gist ${remoteOrbTotal}개(${remoteOrbDates.length}일)` +
+        `\n\n로컬 구슬 날짜: ${localOrbDates.join(", ") || "(없음)"}` +
+        `\nGist 구슬 날짜: ${remoteOrbDates.join(", ") || "(없음)"}` +
+        (localOrbDates.length ? localOrbDates.map(d => `\n  ${d}: 로컬 ${localOrbs[d]?.length || 0}개 / Gist ${remoteOrbs[d]?.length || 0}개`).join("") : "")
+      );
+    } catch (e) { setDiag("진단 실패: " + e.message); }
+  };
   return (
     <div className="overlay" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
@@ -1141,6 +1165,8 @@ function SyncManager({ token, gistId, onConnect, onDisconnect, onClose }) {
             <b>토큰 만들기</b>: GitHub → Settings → Developer settings → Personal access tokens → <i>Tokens (classic)</i>에서 <b>gist</b> 권한만 체크해 발급.
           </p>
           {gistId && <p className="status-note">현재 Gist ID: <b>{gistId}</b></p>}
+          {token && gistId && <button className="ghost-btn" style={{marginTop:8,width:"100%"}} onClick={runDiag}>🔍 동기화 진단</button>}
+          {diag && <pre className="status-note" style={{whiteSpace:"pre-wrap",background:"#1a1a2e",padding:8,borderRadius:6,fontSize:11,marginTop:8,lineHeight:1.5}}>{diag}</pre>}
         </div>
         <div className="modal-foot">
           {token && <button className="ghost-btn" onClick={() => { onDisconnect(); onClose(); }}>연결 해제</button>}
