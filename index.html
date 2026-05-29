@@ -357,10 +357,7 @@ function mergeOrbs(local, remote) {
   let changed = false;
   const merged = {...local};
   for (const date in remote) {
-    if (!merged[date]) { merged[date] = remote[date]; changed = true; continue; }
-    const ids = new Set(merged[date].map((o) => o.id));
-    const added = remote[date].filter((o) => !ids.has(o.id));
-    if (added.length) { merged[date] = [...merged[date], ...added]; changed = true; }
+    if (JSON.stringify(merged[date]) !== JSON.stringify(remote[date])) { merged[date] = remote[date]; changed = true; }
   }
   return changed ? merged : local;
 }
@@ -493,8 +490,8 @@ function App() {
           if (remote.categories?.length) setCategories(remote.categories);
           if (remote.entries) setEntries((prev) => mergeEntries(prev, remote.entries));
           if (remote.alarms) setAlarms(remote.alarms);
-          setOrbCategories((prev) => mergeById(prev, remote.orbCategories || []));
-          setActions((prev) => mergeById(prev, remote.actions || []));
+          if (remote.orbCategories?.length) setOrbCategories(remote.orbCategories);
+          if (remote.actions) setActions(remote.actions);
           setOrbs((prev) => mergeOrbs(prev, remote.orbs || {}));
           if (remote.archives) setArchives((prev) => { const m = {...prev, ...remote.archives}; return JSON.stringify(m) !== JSON.stringify(prev) ? m : prev; });
           if (remote.updatedAt) lastWrittenAtRef.current = Math.max(lastWrittenAtRef.current, remote.updatedAt);
@@ -532,8 +529,8 @@ function App() {
           if (remote.categories?.length) setCategories(remote.categories);
           if (remote.entries) setEntries((prev) => mergeEntries(prev, remote.entries));
           if (remote.alarms) setAlarms(remote.alarms);
-          setOrbCategories((prev) => mergeById(prev, remote.orbCategories || []));
-          setActions((prev) => mergeById(prev, remote.actions || []));
+          if (remote.orbCategories?.length) setOrbCategories(remote.orbCategories);
+          if (remote.actions) setActions(remote.actions);
           setOrbs((prev) => mergeOrbs(prev, remote.orbs || {}));
           if (remote.archives) setArchives((prev) => { const m = {...prev, ...remote.archives}; return JSON.stringify(m) !== JSON.stringify(prev) ? m : prev; });
           if (remote.updatedAt) lastWrittenAtRef.current = Math.max(lastWrittenAtRef.current, remote.updatedAt);
@@ -612,8 +609,8 @@ function App() {
           if (remote.categories?.length) setCategories(remote.categories);
           if (remote.entries) setEntries((prev) => mergeEntries(prev, remote.entries));
           if (remote.alarms) setAlarms(remote.alarms);
-          setOrbCategories((prev) => mergeById(prev, remote.orbCategories || []));
-          setActions((prev) => mergeById(prev, remote.actions || []));
+          if (remote.orbCategories?.length) setOrbCategories(remote.orbCategories);
+          if (remote.actions) setActions(remote.actions);
           setOrbs((prev) => mergeOrbs(prev, remote.orbs || {}));
           if (remote.archives) setArchives((prev) => { const m = {...prev, ...remote.archives}; return JSON.stringify(m) !== JSON.stringify(prev) ? m : prev; });
           setSyncVersion((v) => v + 1);
@@ -806,8 +803,8 @@ function App() {
         if (remote.categories?.length) setCategories(remote.categories);
         if (remote.entries) setEntries((prev) => mergeEntries(prev, remote.entries));
         if (remote.alarms) setAlarms(remote.alarms);
-        setOrbCategories((prev) => mergeById(prev, remote.orbCategories || []));
-        setActions((prev) => mergeById(prev, remote.actions || []));
+        if (remote.orbCategories?.length) setOrbCategories(remote.orbCategories);
+        if (remote.actions) setActions(remote.actions);
         setOrbs((prev) => mergeOrbs(prev, remote.orbs || {}));
         if (remote.archives) setArchives((prev) => ({...prev, ...remote.archives}));
         if (remote.updatedAt) lastWrittenAtRef.current = Math.max(lastWrittenAtRef.current, remote.updatedAt);
