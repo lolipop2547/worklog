@@ -350,35 +350,46 @@ const lighten = (hex, amt) => {
 };
 
 // ===================== 병합 유틸 =====================
-// 구슬: 날짜별로 합치고, 같은 ID는 중복 제거
+// 구슬: 날짜별로 합치고, 같은 ID는 중복 제거. 변경 없으면 같은 참조 반환 (무한루프 방지)
 function mergeOrbs(local, remote) {
-  if (!remote || !Object.keys(remote).length) return local;
+  if (!remote || !Object.keys(remote).length) return local || {};
   if (!local || !Object.keys(local).length) return remote;
+  let changed = false;
   const merged = {...local};
   for (const date in remote) {
-    if (!merged[date]) { merged[date] = remote[date]; continue; }
+    if (!merged[date]) { merged[date] = remote[date]; changed = true; continue; }
     const ids = new Set(merged[date].map((o) => o.id));
     const added = remote[date].filter((o) => !ids.has(o.id));
-    if (added.length) merged[date] = [...merged[date], ...added];
+    if (added.length) { merged[date] = [...merged[date], ...added]; changed = true; }
   }
-  return merged;
+  return changed ? merged : local;
 }
-// ID 기반 배열 병합 (카테고리, 행동)
+// ID 기반 배열 병합. 변경 없으면 같은 참조 반환
 function mergeById(local, remote) {
-  if (!remote?.length) return local;
+  if (!remote?.length) return local || [];
   if (!local?.length) return remote;
-  const map = new Map();
-  local.forEach((item) => map.set(item.id, item));
-  remote.forEach((item) => { if (!map.has(item.id)) map.set(item.id, item); else map.set(item.id, {...map.get(item.id), ...item}); });
-  return [...map.values()];
+  const localIds = new Set(local.map((item) => item.id));
+  const newItems = remote.filter((item) => !localIds.has(item.id));
+  // 기존 항목 업데이트 체크
+  let updated = false;
+  const merged = local.map((item) => {
+    const ri = remote.find((r) => r.id === item.id);
+    if (ri && JSON.stringify(ri) !== JSON.stringify(item)) { updated = true; return {...item, ...ri}; }
+    return item;
+  });
+  if (newItems.length) return [...merged, ...newItems];
+  return updated ? merged : local;
 }
-// entries(작업일지): 날짜별 병합, 원격이 더 최신이면 원격 우선
+// entries: 날짜별 병합
 function mergeEntries(local, remote) {
-  if (!remote) return local;
+  if (!remote) return local || {};
   if (!local || !Object.keys(local).length) return remote;
+  let changed = false;
   const merged = {...local};
-  for (const date in remote) { merged[date] = remote[date]; }
-  return merged;
+  for (const date in remote) {
+    if (JSON.stringify(merged[date]) !== JSON.stringify(remote[date])) { merged[date] = remote[date]; changed = true; }
+  }
+  return changed ? merged : local;
 }
 
 // ===================== Gist API =====================
@@ -445,6 +456,7 @@ function App() {
   const loadedRef = useRef(false);
   const writeTimer = useRef(null);
   const pendingPayloadRef = useRef(null);
+  const lastWrittenAtRef = useRef(0);
 
   useEffect(() => { localStorage.setItem(LS_LAST_TAB, tab); }, [tab]);
 
@@ -482,7 +494,8 @@ function App() {
           setOrbCategories((prev) => mergeById(prev, remote.orbCategories || []));
           setActions((prev) => mergeById(prev, remote.actions || []));
           setOrbs((prev) => mergeOrbs(prev, remote.orbs || {}));
-          if (remote.archives) setArchives((prev) => ({...prev, ...remote.archives}));
+          if (remote.archives) setArchives((prev) => { const m = {...prev, ...remote.archives}; return JSON.stringify(m) !== JSON.stringify(prev) ? m : prev; });
+          if (remote.updatedAt) lastWrittenAtRef.current = Math.max(lastWrittenAtRef.current, remote.updatedAt);
           setSyncState("ok"); setSyncMsg("동기화됨 ✓");
           setTimeout(() => setSyncState("idle"), 1600);
         })
@@ -519,7 +532,8 @@ function App() {
           setOrbCategories((prev) => mergeById(prev, remote.orbCategories || []));
           setActions((prev) => mergeById(prev, remote.actions || []));
           setOrbs((prev) => mergeOrbs(prev, remote.orbs || {}));
-          if (remote.archives) setArchives((prev) => ({...prev, ...remote.archives}));
+          if (remote.archives) setArchives((prev) => { const m = {...prev, ...remote.archives}; return JSON.stringify(m) !== JSON.stringify(prev) ? m : prev; });
+          if (remote.updatedAt) lastWrittenAtRef.current = Math.max(lastWrittenAtRef.current, remote.updatedAt);
           setSyncState("ok"); setSyncMsg("동기화됨 ✓");
           setTimeout(() => setSyncState("idle"), 1600);
         })
@@ -541,6 +555,7 @@ function App() {
         pendingPayloadRef.current = null;
         try {
           const newId = await gistWrite(token, gistId, payload);
+          lastWrittenAtRef.current = payload.updatedAt;
           if (!gistId && newId) { setGistId(newId); localStorage.setItem(LS_GISTID, newId); }
           setSyncState("ok"); setSyncMsg("동기화됨 ✓");
           setTimeout(() => setSyncState("idle"), 1600);
@@ -574,6 +589,30 @@ function App() {
       document.removeEventListener("visibilitychange", onVisChange);
       window.removeEventListener("beforeunload", flushPending);
     };
+  }, [token, gistId]);
+
+  // 30초마다 Gist 폴링 — 다른 기기의 변경 자동 감지
+  useEffect(() => {
+    const t = token, g = gistId;
+    if (!t || !g) return;
+    const poll = setInterval(() => {
+      if (pendingPayloadRef.current) return; // 저장 중이면 건너뜀
+      gistRead(t, g)
+        .then((remote) => {
+          if (!remote.updatedAt || remote.updatedAt <= lastWrittenAtRef.current) return;
+          // 다른 기기가 더 최근에 저장함 → 병합
+          lastWrittenAtRef.current = remote.updatedAt;
+          if (remote.categories?.length) setCategories(remote.categories);
+          if (remote.entries) setEntries((prev) => mergeEntries(prev, remote.entries));
+          if (remote.alarms) setAlarms(remote.alarms);
+          setOrbCategories((prev) => mergeById(prev, remote.orbCategories || []));
+          setActions((prev) => mergeById(prev, remote.actions || []));
+          setOrbs((prev) => mergeOrbs(prev, remote.orbs || {}));
+          if (remote.archives) setArchives((prev) => { const m = {...prev, ...remote.archives}; return JSON.stringify(m) !== JSON.stringify(prev) ? m : prev; });
+        })
+        .catch(() => {});
+    }, 30000);
+    return () => clearInterval(poll);
   }, [token, gistId]);
 
   // 월 그리드
