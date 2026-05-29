@@ -454,9 +454,11 @@ function App() {
   const [syncState, setSyncState] = useState("idle");
   const [syncMsg, setSyncMsg] = useState("");
   const loadedRef = useRef(false);
+  const gistReadyRef = useRef(false);
   const writeTimer = useRef(null);
   const pendingPayloadRef = useRef(null);
   const lastWrittenAtRef = useRef(0);
+  const [syncVersion, setSyncVersion] = useState(0);
 
   useEffect(() => { localStorage.setItem(LS_LAST_TAB, tab); }, [tab]);
 
@@ -496,6 +498,7 @@ function App() {
           setOrbs((prev) => mergeOrbs(prev, remote.orbs || {}));
           if (remote.archives) setArchives((prev) => { const m = {...prev, ...remote.archives}; return JSON.stringify(m) !== JSON.stringify(prev) ? m : prev; });
           if (remote.updatedAt) lastWrittenAtRef.current = Math.max(lastWrittenAtRef.current, remote.updatedAt);
+          setSyncVersion((v) => v + 1);
           setSyncState("ok"); setSyncMsg("동기화됨 ✓");
           setTimeout(() => setSyncState("idle"), 1600);
         })
@@ -534,10 +537,14 @@ function App() {
           setOrbs((prev) => mergeOrbs(prev, remote.orbs || {}));
           if (remote.archives) setArchives((prev) => { const m = {...prev, ...remote.archives}; return JSON.stringify(m) !== JSON.stringify(prev) ? m : prev; });
           if (remote.updatedAt) lastWrittenAtRef.current = Math.max(lastWrittenAtRef.current, remote.updatedAt);
+          gistReadyRef.current = true;
+          setSyncVersion((v) => v + 1);
           setSyncState("ok"); setSyncMsg("동기화됨 ✓");
           setTimeout(() => setSyncState("idle"), 1600);
         })
-        .catch((err) => { setSyncState("warn"); setSyncMsg("동기화 실패"); console.warn(err); });
+        .catch((err) => { gistReadyRef.current = true; setSyncState("warn"); setSyncMsg("동기화 실패"); console.warn(err); });
+    } else {
+      gistReadyRef.current = true;
     }
   }, []); // eslint-disable-line
 
@@ -547,7 +554,7 @@ function App() {
     const payload = { categories, entries, alarms, orbCategories, actions, orbs, archives, updatedAt: Date.now() };
     try { localStorage.setItem(LS_DATA, JSON.stringify(payload)); } catch (e) {}
 
-    if (token) {
+    if (token && gistReadyRef.current) {
       pendingPayloadRef.current = payload;
       if (writeTimer.current) clearTimeout(writeTimer.current);
       setSyncState("syncing"); setSyncMsg("저장 중…");
@@ -562,7 +569,7 @@ function App() {
         } catch (err) { setSyncState("warn"); setSyncMsg("저장 실패"); console.warn(err); }
       }, 1200);
     }
-  }, [categories, entries, alarms, orbCategories, actions, orbs, archives, token, gistId]);
+  }, [categories, entries, alarms, orbCategories, actions, orbs, archives, token, gistId, syncVersion]);
 
   // 앱 이탈 시 미저장 Gist 즉시 전송
   useEffect(() => {
@@ -609,6 +616,7 @@ function App() {
           setActions((prev) => mergeById(prev, remote.actions || []));
           setOrbs((prev) => mergeOrbs(prev, remote.orbs || {}));
           if (remote.archives) setArchives((prev) => { const m = {...prev, ...remote.archives}; return JSON.stringify(m) !== JSON.stringify(prev) ? m : prev; });
+          setSyncVersion((v) => v + 1);
         })
         .catch(() => {});
     }, 30000);
@@ -791,6 +799,7 @@ function App() {
   const connectGist = (newToken, newGistId) => {
     setToken(newToken); localStorage.setItem(LS_TOKEN, newToken);
     if (newGistId) { setGistId(newGistId); localStorage.setItem(LS_GISTID, newGistId); }
+    gistReadyRef.current = false;
     setSyncState("syncing"); setSyncMsg("연결 중…");
     gistRead(newToken, newGistId || gistId)
       .then((remote) => {
@@ -801,9 +810,13 @@ function App() {
         setActions((prev) => mergeById(prev, remote.actions || []));
         setOrbs((prev) => mergeOrbs(prev, remote.orbs || {}));
         if (remote.archives) setArchives((prev) => ({...prev, ...remote.archives}));
+        if (remote.updatedAt) lastWrittenAtRef.current = Math.max(lastWrittenAtRef.current, remote.updatedAt);
+        gistReadyRef.current = true;
+        setSyncVersion((v) => v + 1);
         setSyncState("ok"); setSyncMsg("동기화됨 ✓"); setTimeout(() => setSyncState("idle"), 1600);
       })
       .catch(() => {
+        gistReadyRef.current = true;
         setSyncState("idle"); setSyncMsg("");
       });
   };
