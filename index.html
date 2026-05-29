@@ -349,6 +349,38 @@ const lighten = (hex, amt) => {
   return `rgb(${r},${g},${b})`;
 };
 
+// ===================== 병합 유틸 =====================
+// 구슬: 날짜별로 합치고, 같은 ID는 중복 제거
+function mergeOrbs(local, remote) {
+  if (!remote || !Object.keys(remote).length) return local;
+  if (!local || !Object.keys(local).length) return remote;
+  const merged = {...local};
+  for (const date in remote) {
+    if (!merged[date]) { merged[date] = remote[date]; continue; }
+    const ids = new Set(merged[date].map((o) => o.id));
+    const added = remote[date].filter((o) => !ids.has(o.id));
+    if (added.length) merged[date] = [...merged[date], ...added];
+  }
+  return merged;
+}
+// ID 기반 배열 병합 (카테고리, 행동)
+function mergeById(local, remote) {
+  if (!remote?.length) return local;
+  if (!local?.length) return remote;
+  const map = new Map();
+  local.forEach((item) => map.set(item.id, item));
+  remote.forEach((item) => { if (!map.has(item.id)) map.set(item.id, item); else map.set(item.id, {...map.get(item.id), ...item}); });
+  return [...map.values()];
+}
+// entries(작업일지): 날짜별 병합, 원격이 더 최신이면 원격 우선
+function mergeEntries(local, remote) {
+  if (!remote) return local;
+  if (!local || !Object.keys(local).length) return remote;
+  const merged = {...local};
+  for (const date in remote) { merged[date] = remote[date]; }
+  return merged;
+}
+
 // ===================== Gist API =====================
 async function gistRead(token, gistId) {
   const res = await fetch(`https://api.github.com/gists/${gistId}`, {
@@ -445,12 +477,12 @@ function App() {
       gistRead(t, g)
         .then((remote) => {
           if (remote.categories?.length) setCategories(remote.categories);
-          if (remote.entries) setEntries(remote.entries);
+          if (remote.entries) setEntries((prev) => mergeEntries(prev, remote.entries));
           if (remote.alarms) setAlarms(remote.alarms);
-          if (remote.orbCategories?.length) setOrbCategories(remote.orbCategories);
-          if (Array.isArray(remote.actions) && remote.actions.length) setActions(remote.actions);
-          if (remote.orbs && Object.keys(remote.orbs).length) setOrbs(remote.orbs);
-          if (remote.archives && Object.keys(remote.archives).length) setArchives(remote.archives);
+          setOrbCategories((prev) => mergeById(prev, remote.orbCategories || []));
+          setActions((prev) => mergeById(prev, remote.actions || []));
+          setOrbs((prev) => mergeOrbs(prev, remote.orbs || {}));
+          if (remote.archives) setArchives((prev) => ({...prev, ...remote.archives}));
           setSyncState("ok"); setSyncMsg("동기화됨 ✓");
           setTimeout(() => setSyncState("idle"), 1600);
         })
@@ -482,14 +514,12 @@ function App() {
       gistRead(token, gistId)
         .then((remote) => {
           if (remote.categories?.length) setCategories(remote.categories);
-          if (remote.entries) setEntries(remote.entries);
+          if (remote.entries) setEntries((prev) => mergeEntries(prev, remote.entries));
           if (remote.alarms) setAlarms(remote.alarms);
-          // 구슬 필드: 원격에 있으면 사용, 없으면(구버전 저장) 로컬 유지
-          if (remote.orbCategories?.length) setOrbCategories(remote.orbCategories);
-          if (Array.isArray(remote.actions) && remote.actions.length) setActions(remote.actions);
-          if (remote.orbs && Object.keys(remote.orbs).length) setOrbs(remote.orbs);
-          else if (!remote.orbs) setOrbs((local) => local); // 구버전이 날린 경우 로컬 보존
-          if (remote.archives && Object.keys(remote.archives).length) setArchives(remote.archives);
+          setOrbCategories((prev) => mergeById(prev, remote.orbCategories || []));
+          setActions((prev) => mergeById(prev, remote.actions || []));
+          setOrbs((prev) => mergeOrbs(prev, remote.orbs || {}));
+          if (remote.archives) setArchives((prev) => ({...prev, ...remote.archives}));
           setSyncState("ok"); setSyncMsg("동기화됨 ✓");
           setTimeout(() => setSyncState("idle"), 1600);
         })
@@ -726,12 +756,12 @@ function App() {
     gistRead(newToken, newGistId || gistId)
       .then((remote) => {
         if (remote.categories?.length) setCategories(remote.categories);
-        if (remote.entries) setEntries(remote.entries);
+        if (remote.entries) setEntries((prev) => mergeEntries(prev, remote.entries));
         if (remote.alarms) setAlarms(remote.alarms);
-        if (remote.orbCategories?.length) setOrbCategories(remote.orbCategories);
-        if (Array.isArray(remote.actions) && remote.actions.length) setActions(remote.actions);
-        if (remote.orbs && Object.keys(remote.orbs).length) setOrbs(remote.orbs);
-        if (remote.archives && Object.keys(remote.archives).length) setArchives(remote.archives);
+        setOrbCategories((prev) => mergeById(prev, remote.orbCategories || []));
+        setActions((prev) => mergeById(prev, remote.actions || []));
+        setOrbs((prev) => mergeOrbs(prev, remote.orbs || {}));
+        if (remote.archives) setArchives((prev) => ({...prev, ...remote.archives}));
         setSyncState("ok"); setSyncMsg("동기화됨 ✓"); setTimeout(() => setSyncState("idle"), 1600);
       })
       .catch(() => {
