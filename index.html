@@ -233,6 +233,8 @@
   .orb-routine-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
   .orb-empty-msg { text-align: center; color: var(--faint); font-size: 13px; padding: 20px 8px; line-height: 1.7; }
   .orb-manage-row { display: flex; gap: 8px; justify-content: center; margin-top: 6px; margin-bottom: 16px; }
+  .undo-toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--ink-deep); color: #fff; border-radius: 12px; padding: 10px 20px; font-size: 14px; font-weight: 500; box-shadow: 0 4px 16px #00000030; z-index: 40; display: flex; align-items: center; gap: 12px; animation: fd .25s; }
+  .undo-toast-btn { background: none; border: none; color: #fbbf24; font-family: var(--font-body); font-size: 14px; font-weight: 700; padding: 0; cursor: pointer; }
 
   /* ===== 크기 선택 ===== */
   .size-picker-overlay { position: fixed; inset: 0; z-index: 60; background: transparent; }
@@ -744,6 +746,18 @@ function App() {
     });
   }, [currentDate]);
 
+  const removeLastOrb = useCallback(() => {
+    const ds = currentDate;
+    setOrbs((prev) => {
+      const day = prev[ds];
+      if (!day || day.length === 0) return prev;
+      const next = {...prev};
+      next[ds] = day.slice(0, -1);
+      if (next[ds].length === 0) delete next[ds];
+      return next;
+    });
+  }, [currentDate]);
+
   // 황금 구슬 수 계산
   const goldenForMonth = useCallback((ym) => {
     let count = 0;
@@ -951,7 +965,7 @@ function App() {
 
       {tab==="orbs" && (
         <OrbsTab currentDate={currentDate} orbCategories={orbCategories} actions={actions} orbs={orbs}
-          onAddOrb={addOrb} onAddAction={addAction} onManage={() => setOrbManageOpen(true)} />
+          onAddOrb={addOrb} onRemoveLastOrb={removeLastOrb} onAddAction={addAction} onManage={() => setOrbManageOpen(true)} />
       )}
 
       {tab==="alarm" && (
@@ -1381,12 +1395,25 @@ function AlarmTab({ alarms, workCats, onAddWork, onAdd, onClear }) {
 
 
 // ===================== 구슬 탭 =====================
-function OrbsTab({ currentDate, orbCategories, actions, orbs, onAddOrb, onAddAction, onManage }) {
+function OrbsTab({ currentDate, orbCategories, actions, orbs, onAddOrb, onRemoveLastOrb, onAddAction, onManage }) {
   const [selCat, setSelCat] = useState(orbCategories[0]?.id || "");
   const [sizePicker, setSizePicker] = useState(null);
   const [quickName, setQuickName] = useState("");
+  const [undoVisible, setUndoVisible] = useState(false);
+  const undoTimer = useRef(null);
   const pressTimer = useRef(null);
   const pressStartPos = useRef(null);
+
+  const showUndo = () => {
+    if (undoTimer.current) clearTimeout(undoTimer.current);
+    setUndoVisible(true);
+    undoTimer.current = setTimeout(() => setUndoVisible(false), 5000);
+  };
+  const handleUndo = () => {
+    onRemoveLastOrb();
+    setUndoVisible(false);
+    if (undoTimer.current) clearTimeout(undoTimer.current);
+  };
 
   const todayOrbs = useMemo(() => orbs[currentDate] || [], [orbs, currentDate]);
   const catActions = useMemo(() => actions.filter((a) => a.categoryId === selCat), [actions, selCat]);
@@ -1404,6 +1431,7 @@ function OrbsTab({ currentDate, orbCategories, actions, orbs, onAddOrb, onAddAct
 
   const handleTap = (action) => {
     onAddOrb(action.categoryId, action.id, "m", action.isSpecial);
+    showUndo();
   };
 
   const handlePointerDown = (action, e) => {
@@ -1442,6 +1470,7 @@ function OrbsTab({ currentDate, orbCategories, actions, orbs, onAddOrb, onAddAct
     if (sizePicker) {
       onAddOrb(sizePicker.action.categoryId, sizePicker.action.id, size, sizePicker.action.isSpecial);
       setSizePicker(null);
+      showUndo();
     }
   };
 
@@ -1515,6 +1544,13 @@ function OrbsTab({ currentDate, orbCategories, actions, orbs, onAddOrb, onAddAct
 
       {routineActions.length > 0 && (
         <RoutineReport orbs={orbs} actions={routineActions} orbCategories={orbCategories} currentDate={currentDate} />
+      )}
+
+      {undoVisible && (
+        <div className="undo-toast">
+          <span>구슬이 추가됨</span>
+          <button className="undo-toast-btn" onClick={handleUndo}>되돌리기</button>
+        </div>
       )}
     </div>
   );
