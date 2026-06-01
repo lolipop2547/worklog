@@ -411,7 +411,7 @@ async function gistWrite(token, gistId, payload) {
       headers: { Authorization: `token ${token}`, Accept: "application/vnd.github+json", "Content-Type": "application/json" },
       body,
     });
-    if (!res.ok) throw new Error(`Gist 저장 실패 (${res.status})`);
+    if (!res.ok) { const t = await res.text().catch(()=>""); throw new Error(`Gist 저장 실패 (${res.status}) ${t.substring(0,200)}`); }
     return (await res.json()).id;
   } else {
     const res = await fetch("https://api.github.com/gists", {
@@ -491,8 +491,8 @@ function App() {
           if (remote.categories?.length) setCategories(remote.categories);
           if (remote.entries) setEntries((prev) => mergeEntries(prev, remote.entries));
           if (remote.alarms) setAlarms(remote.alarms);
-          if (remote.orbCategories?.length) setOrbCategories(remote.orbCategories);
-          if (remote.actions) setActions(remote.actions);
+          if (remote.orbCategories?.length) setOrbCategories((prev) => mergeById(prev, remote.orbCategories));
+          if (remote.actions) setActions((prev) => mergeById(prev, remote.actions));
           setOrbs((prev) => mergeOrbs(prev, remote.orbs || {}));
           if (remote.archives) setArchives((prev) => { const m = {...prev, ...remote.archives}; return JSON.stringify(m) !== JSON.stringify(prev) ? m : prev; });
           if (remote.updatedAt) lastWrittenAtRef.current = Math.max(lastWrittenAtRef.current, remote.updatedAt);
@@ -530,8 +530,8 @@ function App() {
           if (remote.categories?.length) setCategories(remote.categories);
           if (remote.entries) setEntries((prev) => mergeEntries(prev, remote.entries));
           if (remote.alarms) setAlarms(remote.alarms);
-          if (remote.orbCategories?.length) setOrbCategories(remote.orbCategories);
-          if (remote.actions) setActions(remote.actions);
+          if (remote.orbCategories?.length) setOrbCategories((prev) => mergeById(prev, remote.orbCategories));
+          if (remote.actions) setActions((prev) => mergeById(prev, remote.actions));
           setOrbs((prev) => mergeOrbs(prev, remote.orbs || {}));
           if (remote.archives) setArchives((prev) => { const m = {...prev, ...remote.archives}; return JSON.stringify(m) !== JSON.stringify(prev) ? m : prev; });
           if (remote.updatedAt) lastWrittenAtRef.current = Math.max(lastWrittenAtRef.current, remote.updatedAt);
@@ -564,7 +564,7 @@ function App() {
           if (!gistId && newId) { setGistId(newId); localStorage.setItem(LS_GISTID, newId); }
           setSyncState("ok"); setSyncMsg("동기화됨 ✓");
           setTimeout(() => setSyncState("idle"), 1600);
-        } catch (err) { setSyncState("warn"); setSyncMsg("저장 실패"); console.warn(err); }
+        } catch (err) { setSyncState("warn"); setSyncMsg("저장 실패: " + (err.message || err).toString().substring(0, 80)); console.warn(err); }
       }, 1200);
     }
   }, [categories, entries, alarms, orbCategories, actions, orbs, archives, token, gistId, syncVersion]);
@@ -610,8 +610,8 @@ function App() {
           if (remote.categories?.length) setCategories(remote.categories);
           if (remote.entries) setEntries((prev) => mergeEntries(prev, remote.entries));
           if (remote.alarms) setAlarms(remote.alarms);
-          if (remote.orbCategories?.length) setOrbCategories(remote.orbCategories);
-          if (remote.actions) setActions(remote.actions);
+          if (remote.orbCategories?.length) setOrbCategories((prev) => mergeById(prev, remote.orbCategories));
+          if (remote.actions) setActions((prev) => mergeById(prev, remote.actions));
           setOrbs((prev) => mergeOrbs(prev, remote.orbs || {}));
           if (remote.archives) setArchives((prev) => { const m = {...prev, ...remote.archives}; return JSON.stringify(m) !== JSON.stringify(prev) ? m : prev; });
           setSyncVersion((v) => v + 1);
@@ -804,8 +804,8 @@ function App() {
         if (remote.categories?.length) setCategories(remote.categories);
         if (remote.entries) setEntries((prev) => mergeEntries(prev, remote.entries));
         if (remote.alarms) setAlarms(remote.alarms);
-        if (remote.orbCategories?.length) setOrbCategories(remote.orbCategories);
-        if (remote.actions) setActions(remote.actions);
+        if (remote.orbCategories?.length) setOrbCategories((prev) => mergeById(prev, remote.orbCategories));
+        if (remote.actions) setActions((prev) => mergeById(prev, remote.actions));
         setOrbs((prev) => mergeOrbs(prev, remote.orbs || {}));
         if (remote.archives) setArchives((prev) => ({...prev, ...remote.archives}));
         if (remote.updatedAt) lastWrittenAtRef.current = Math.max(lastWrittenAtRef.current, remote.updatedAt);
@@ -1138,7 +1138,7 @@ function SyncManager({ token, gistId, onConnect, onDisconnect, onClose, localOrb
       const remoteEntryDates = Object.keys(remote.entries || {});
       const ts = remote.updatedAt ? new Date(remote.updatedAt).toLocaleString() : "없음";
       setDiag(
-        `[v7] Gist 최종 수정: ${ts}\n` +
+        `[v8] Gist 최종 수정: ${ts}\n` +
         `\n📋 작업일지: 로컬 ${localEntryDates.length}일 / Gist ${remoteEntryDates.length}일` +
         `\n🔮 구슬: 로컬 ${localOrbTotal}개(${localOrbDates.length}일) / Gist ${remoteOrbTotal}개(${remoteOrbDates.length}일)` +
         `\n\n로컬 구슬 날짜: ${localOrbDates.join(", ") || "(없음)"}` +
