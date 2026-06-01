@@ -1436,9 +1436,9 @@ function OrbsTab({ currentDate, orbCategories, actions, orbs, onAddOrb, onRemove
 
   const handlePointerDown = (action, e) => {
     pressStartPos.current = { x: e.clientX || 0, y: e.clientY || 0 };
+    const rect = e.currentTarget.getBoundingClientRect();
     pressTimer.current = setTimeout(() => {
       pressTimer.current = null;
-      const rect = e.currentTarget.getBoundingClientRect();
       setSizePicker({ action, x: rect.left, y: rect.top - 80 });
     }, 500);
   };
