@@ -299,7 +299,7 @@
   } catch(e){}
   if ("serviceWorker" in navigator) {
     try {
-      var sw = "self.addEventListener('install',function(e){self.skipWaiting()});self.addEventListener('activate',function(e){e.waitUntil(self.clients.claim())});self.addEventListener('fetch',function(e){if(e.request.url.indexOf('api.github.com')!==-1)return;e.respondWith(fetch(e.request).catch(function(){return caches.match(e.request)}))})";
+      var sw = "self.addEventListener('install',function(e){self.skipWaiting()});self.addEventListener('activate',function(e){e.waitUntil(self.clients.claim())});self.addEventListener('fetch',function(e){var u=e.request.url;if(u.indexOf('api.github.com')!==-1)return;e.respondWith(fetch(e.request,{cache:'no-store'}).then(function(r){try{var c=r.clone();caches.open('worklog-v1').then(function(ch){ch.put(e.request,c)})}catch(x){}return r}).catch(function(){return caches.match(e.request)}))})";
       navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:"application/javascript"}))).catch(function(){});
     } catch(e){}
   }
@@ -328,6 +328,7 @@ const LS_DATA = "worklog:data:v1";
 const LS_TOKEN = "worklog:gh_token:v1";
 const LS_GISTID = "worklog:gist_id:v1";
 const LS_LAST_TAB = "worklog:last_tab:v1";
+const BUILD = "2026-06-02.1";
 const GIST_FILENAME = "worklog-data.json";
 const ORB_SIZES = { s: 7, m: 11, l: 16, xl: 22 };
 const ORB_SIZE_LABELS = { s: "작은", m: "중간", l: "큰", xl: "아주 큰" };
@@ -848,7 +849,7 @@ function App() {
       <header>
         <div>
           <h1>{titles[tab]}</h1>
-          <p className="subtitle">{subtitles[tab]}</p>
+          <p className="subtitle">{subtitles[tab]} <span style={{ color: "var(--faint)", fontSize: 10, marginLeft: 4 }}>v{BUILD}</span></p>
         </div>
         <div className="header-right">
           <span className={`sync-badge ${syncClass}`}>{syncMsg}</span>
