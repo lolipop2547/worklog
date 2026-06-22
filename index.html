@@ -280,10 +280,25 @@
 </head>
 <body>
 <div id="root"></div>
+<div id="boot-fallback" style="display:none; max-width:520px; margin:60px auto; padding:0 24px; text-align:center; font-family:sans-serif; color:#3a3027;">
+  <div style="font-size:18px; font-weight:700; margin-bottom:10px;">화면을 불러오지 못했어요</div>
+  <p style="font-size:14px; line-height:1.7; color:#9c8d77;">인터넷 연결이 불안정하거나 일부 구성요소를 받지 못했어요.<br/>잠시 후 새로고침해 주세요. 저장된 기록은 안전하게 보관돼 있어요.</p>
+  <button onclick="location.reload(true)" style="margin-top:14px; padding:10px 20px; border:none; border-radius:10px; background:#4a7c59; color:#fff; font-size:14px; font-weight:700; cursor:pointer;">새로고침</button>
+</div>
+<script>
+  // 외부 스크립트 로딩 실패 등으로 앱이 8초 안에 안 뜨면 안내 화면 표시
+  window.__bootCheck = setTimeout(function(){
+    var root = document.getElementById("root");
+    if (!root || root.childElementCount === 0) {
+      var fb = document.getElementById("boot-fallback");
+      if (fb) fb.style.display = "block";
+    }
+  }, 8000);
+</script>
 
-<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone@7.26.4/babel.min.js"></script>
 <script src="https://unpkg.com/matter-js@0.20.0/build/matter.min.js"></script>
 
 <script>
@@ -328,7 +343,7 @@ const LS_DATA = "worklog:data:v1";
 const LS_TOKEN = "worklog:gh_token:v1";
 const LS_GISTID = "worklog:gist_id:v1";
 const LS_LAST_TAB = "worklog:last_tab:v1";
-const BUILD = "2026-06-02.1";
+const BUILD = "2026-06-02.2";
 const GIST_FILENAME = "worklog-data.json";
 const ORB_SIZES = { s: 7, m: 11, l: 16, xl: 22 };
 const ORB_SIZE_LABELS = { s: "작은", m: "중간", l: "큰", xl: "아주 큰" };
@@ -1957,6 +1972,7 @@ function OrbActionManager({ orbCategories, actions, onAddCategory, onUpdateCateg
 
 
 ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+if (window.__bootCheck) clearTimeout(window.__bootCheck);
 </script>
 </body>
 </html>
